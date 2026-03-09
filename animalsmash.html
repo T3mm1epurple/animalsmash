@@ -4012,6 +4012,7 @@ function setupGuestConnection(conn) {
                 slots = data.playerSlots.map(s => ({ id:s.slotId, type:'player', char:s.char, difficulty:'player', team:s.team }));
                 teamMode = data.isTeamMode || false;
                 if (data.teamAssign) Object.assign(teamAssign, data.teamAssign);
+                arcadeState = null; // ensure arcade screen doesn't hijack online game-over
                 hideAllScreens();
                 document.getElementById('game-hud').classList.remove('hidden');
                 document.getElementById('score-banner').classList.remove('hidden');
@@ -4128,6 +4129,7 @@ function hostStartGame() {
     broadcastToGuests({ type:'start_game', playerSlots, mapIdx, rules:matchRules, isTeamMode:is2v2 });
     slots = playerSlots.map(s => ({ id:s.slotId, type:'player', char:s.char, difficulty:s.slotId===0?'normal':'player', team:s.team }));
     teamMode = is2v2;
+    arcadeState = null; // ensure arcade screen doesn't hijack online game-over
     hideAllScreens();
     document.getElementById('game-hud').classList.remove('hidden');
     document.getElementById('score-banner').classList.remove('hidden');
@@ -8636,6 +8638,7 @@ function checkTauntInput(player) {
 // ═══════════════════════════════════════════════════════════════════════
 function localPlayAgain() {
     // Reuse exact same slots, map, and rules — just restart
+    arcadeState = null; // ensure arcade screen doesn't hijack local game-over
     hideAllScreens();
     document.getElementById('game-hud').classList.remove('hidden');
     document.getElementById('score-banner').classList.remove('hidden','sudden-death-timer');
@@ -9305,6 +9308,35 @@ const SECRET_CODES = {
         desc:'Unlocks a secret character. Handle with care.',
         reward: () => { if(!AVAILABLE_CHARS.includes('🧍')) AVAILABLE_CHARS.push('🧍'); }
     },
+    'DEBUGTEST': {
+        type:'character', emoji:'🎮', name:'Debug Unlock',
+        desc:'Unlocks every character in the game instantly.',
+        reward: () => {
+            // All characters that can be unlocked via arcade, speed, survival, boss rush, codes, or mastery
+            const allUnlockable = [
+                '🐿️','🦣','👻','👾',         // arcade difficulty rewards
+                '🦖','🦕','💀','🌑',         // arcade speed rewards
+                '🪽','🌪️',                   // survival score rewards
+                '🐲',                          // boss rush reward
+                '👅','🦫','🐉','🧍',          // secret code characters
+                '🐦‍🔥',                       // mastery apex unlock
+            ];
+            allUnlockable.forEach(em => { if(!AVAILABLE_CHARS.includes(em)) AVAILABLE_CHARS.push(em); });
+            // Also grant the localStorage flags so they persist on reload
+            try {
+                const ac = JSON.parse(localStorage.getItem('sas_arcade_cleared')||'{}');
+                ['easy','normal','hard','ultimate'].forEach(d => ac[d]=true);
+                localStorage.setItem('sas_arcade_cleared', JSON.stringify(ac));
+                const as = JSON.parse(localStorage.getItem('sas_arcade_speed')||'{}');
+                ['easy','normal','hard','ultimate'].forEach(d => as[d]=true);
+                localStorage.setItem('sas_arcade_speed', JSON.stringify(as));
+                localStorage.setItem('sas_bossrush_unlocked','1');
+                localStorage.setItem('sas_survival_u1','1');
+                localStorage.setItem('sas_survival_u2','1');
+                localStorage.setItem('sas_apex_unlocked','1');
+            } catch(e) {}
+        }
+    },
 };
 
 let _unlockedCodes = new Set(JSON.parse(localStorage.getItem('sas_codes') || '[]'));
@@ -9460,6 +9492,7 @@ _applyGfxCSS();
 _syncSettingsUI();
 
 function startGame(){
+    arcadeState = null; // ensure arcade screen doesn't hijack local/multiplayer game-over
     hideAllScreens();
     matchRules.mirrorMatch=false;
     matchRules.stageMorph=false;
