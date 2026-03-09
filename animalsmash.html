@@ -5586,7 +5586,8 @@ Object.assign(CHAR_STATS, {
             // Forked lightning orb with rotating spark ring and glowing core
             let bolt=new Projectile(startX,startY,aimed.vx*1.1,aimed.vy*1.1-3,{damage:11,knockback:13,color:'#38bdf8',projType:'normal',projRadius:14},p);
             bolt._life=0;
-            bolt.update=function(map){ this._life++; this.vy+=0.15; this.x+=this.vx; this.y+=this.vy; if(this._life>68||this.y>canvas.height+100) this.active=false; };
+            const _bup=bolt.update.bind(bolt);
+            bolt.update=function(map){ this._life++; this.vy+=0.15; _bup(map); if(this._life>68) this.active=false; };
             bolt.draw=function(){
                 if(!this.active)return;
                 let al=Math.max(0.3,1-this._life/82);
@@ -5741,7 +5742,8 @@ Object.assign(CHAR_STATS, {
                             let fang=baseAng+fi*0.21, fsp=13;
                             let fth=new Projectile(pcx,pcy,Math.cos(fang)*fsp,Math.sin(fang)*fsp,{damage:5,knockback:6,color:'#fde68a',projType:'normal',projRadius:7},p);
                             fth._life=0;
-                            fth.update=function(map){ this._life++; this.vy+=0.1; this.x+=this.vx; this.y+=this.vy; if(this._life>58||this.y>canvas.height+60) this.active=false; };
+                            const _fup=fth.update.bind(fth);
+                            fth.update=function(map){ this._life++; this.vy+=0.1; _fup(map); if(this._life>58) this.active=false; };
                             fth.draw=function(){
                                 if(!this.active)return;
                                 let ang=Math.atan2(this.vy,this.vx); ctx.save();
@@ -5769,7 +5771,8 @@ Object.assign(CHAR_STATS, {
             // Pulsing halo ring that trails sparkles and has a cross-of-light centre
             let proj=new Projectile(startX,startY,aimed.vx*0.7,aimed.vy*0.42-3.5,{damage:7,knockback:7,color:'#fde68a',projType:'normal',projRadius:15},p);
             proj._life=0;
-            proj.update=function(map){ this._life++; this.vy+=0.1; this.x+=this.vx; this.y+=this.vy; if(this._life%5===0) spawnParticles(this.x,this.y,'#fef9c3',2); if(this.y>canvas.height+65) this.active=false; };
+            const _sup=proj.update.bind(proj);
+            proj.update=function(map){ this._life++; this.vy+=0.1; if(this._life%5===0) spawnParticles(this.x,this.y,'#fef9c3',2); _sup(map); if(this.y>canvas.height+65) this.active=false; };
             proj.draw=function(){
                 if(!this.active)return;
                 let pulse=Math.sin(this._life*0.24)*2; ctx.save();
@@ -5904,7 +5907,8 @@ Object.assign(CHAR_STATS, {
             // Spinning tornado projectile with multi-layer ellipse funnel and orbiting debris
             let proj=new Projectile(startX,startY,aimed.vx*0.88,aimed.vy*0.46,{damage:6,knockback:6,color:'#a5b4fc',projType:'normal',projRadius:20},p);
             proj._life=0; proj._spin=0;
-            proj.update=function(map){ this._life++; this._spin+=0.14; this.vy+=0.06*Math.sin(this._life*0.18); this.x+=this.vx; this.y+=this.vy; if(this._life>95||this.y>canvas.height+80) this.active=false; };
+            const _tup=proj.update.bind(proj);
+            proj.update=function(map){ this._life++; this._spin+=0.14; this.vy+=0.06*Math.sin(this._life*0.18); _tup(map); if(this._life>95) this.active=false; };
             proj.draw=function(){
                 if(!this.active)return;
                 let r=this.radius; ctx.save();
@@ -9968,7 +9972,7 @@ class Player {
         if(this.inputs.right){this.vx+=ACCEL;this.dirX=1;}
         if(this.inputs.up){if(!this.prevInputs.up&&this.jumps>0&&!this.isTumbling){this.vy=JUMP_FORCE;this.jumps--;this.onGround=false;this.onPlatform=null;spawnParticles(this.x+this.width/2,this.y+this.height,'#fff',5);}}
         this.prevInputs.up=this.inputs.up;
-        if(this.inputs.attack&&!this.prevInputs.attack&&!this.isTumbling){
+        if(this.inputs.attack&&!this.prevInputs.attack&&(!this.isTumbling||(this.charStats.attackType==='ranged'||this.charStats.attackType==='hybrid'))){
             if(this.hasUlt){this.hasUlt=false;triggerHitStun(20);screenFlash=0.5;spawnParticles(this.x+this.width/2,this.y+this.height/2,'#fbbf24',100);updateUI();if(this.charStats.ult)this.charStats.ult(this,allPlayers);}
             else if(this.attackCooldown<=0&&!this.isAttacking){this.doAction(allPlayers);}
         }
@@ -10437,6 +10441,8 @@ class Player {
             return{vx,vy};
         };
         let aimed=applyAA(pVx,pVy,this.weapon?this.weapon.projType:this.charStats.projType);
+        // When player is launched above screen, force bullets to arc downward so they're visible
+        if(startY < 0 && aimed.vy <= 0) aimed.vy = 12;
         if(!this.weapon&&this.charStats.overrideAttack&&this.charStats.overrideAttack(this,startX,startY,aimed,timeSinceLastAtk))return;
         if(!this.weapon&&this.charStats.attackType==='ranged'&&this.charStats.overrideRanged&&this.charStats.overrideRanged(this,startX,startY,aimed,timeSinceLastAtk)){this.isAttacking=false;this.attackHit=false;this.attackCooldown=this.charStats.frames+this.charStats.cooldown;return;}
         if(this.weapon&&this.weapon.type==='gun'){
