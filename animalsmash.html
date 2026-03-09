@@ -7219,8 +7219,8 @@ function _allObtainableChars(extraFilter){
     if(BOSS_RUSH_UNLOCK?.emoji) set.add(BOSS_RUSH_UNLOCK.emoji);
     // Survival score rewards
     SURVIVAL_SCORE_UNLOCKS.forEach(c=>{ if(c?.emoji) set.add(c.emoji); });
-    // Secret code characters
-    Object.values(SECRET_CODES).forEach(cfg=>{ if(cfg?.emoji) set.add(cfg.emoji); });
+    // Secret code characters (only real characters, not UI placeholder icons)
+    Object.values(SECRET_CODES).forEach(cfg=>{ if(cfg?.emoji && CHAR_STATS[cfg.emoji]) set.add(cfg.emoji); });
     let arr = Array.from(set);
     return extraFilter ? arr.filter(extraFilter) : arr;
 }
