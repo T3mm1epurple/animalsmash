@@ -2522,6 +2522,11 @@
             color:#94a3b8;
         }
         .mb-action-btn.download:hover { background:rgba(255,255,255,0.12); color:#e2e8f0; }
+        .mb-action-btn.overwrite {
+            background:rgba(255,255,255,0.05); border:1px solid rgba(139,92,246,0.25);
+            color:#a78bfa;
+        }
+        .mb-action-btn.overwrite:hover { background:rgba(139,92,246,0.15); color:#c4b5fd; }
         #mb-editor {
             display:flex; flex:1; min-height:0; overflow:hidden;
         }
@@ -3741,6 +3746,7 @@
 
             <div class="mb-topbar-actions">
                 <button class="mb-action-btn download" onclick="MB.download()">⬇ Download</button>
+                <button class="mb-action-btn overwrite" id="mb-overwrite-btn" onclick="MB.showOverwriteDialog()" title="Save as / overwrite an existing map">⇄ Overwrite</button>
                 <button class="mb-action-btn save" onclick="MB.addToGame()">✦ Save to Game</button>
             </div>
         </div>
@@ -3843,8 +3849,8 @@
     <!-- Overwrite Modal -->
     <div id="mb-overwrite-overlay">
         <div id="mb-overwrite-box">
-            <div id="mb-overwrite-title">💾 Save Map</div>
-            <div id="mb-overwrite-desc">Save as a new map, or overwrite an existing one.</div>
+            <div id="mb-overwrite-title">⇄ Overwrite a Map</div>
+            <div id="mb-overwrite-desc">Replace an existing custom map with your current work, or save as new.</div>
             <div id="mb-overwrite-list"><!-- filled by MB.showOverwriteDialog() --></div>
             <div class="mbow-cancel" onclick="MB.closeOverwriteDialog()">Cancel</div>
         </div>
@@ -17050,10 +17056,12 @@ ${obj.shape==='deco'?`<div class="mb-prop-row"><label>Border</label>
 
     // ── Map Manager ───────────────────────────────────────────
     openManager() {
+        const maps = this.getCustomMaps();
+        // No existing maps → go straight to new-map editor
+        if (maps.length === 0) { this.open(null); return; }
         const overlay = document.getElementById('mb-manager-overlay');
         const grid    = document.getElementById('mb-manager-grid');
         if (!overlay||!grid) return;
-        const maps = this.getCustomMaps();
         let html = '';
         maps.forEach(m=>{
             const id   = m._id;
@@ -17159,22 +17167,9 @@ ${obj.shape==='deco'?`<div class="mb-prop-row"><label>Border</label>
     },
 
     addToGame() {
-        // If editing an existing map, just save it directly (no overwrite needed)
-        if (this.mapId) {
-            this.saveToGame();
-            _lpRenderMaps();
-            _mbShowToast('✓ Map saved!');
-            return;
-        }
-        // New map — offer to save new or overwrite an existing one
-        const existing = this.getCustomMaps();
-        if (existing.length === 0) {
-            this.saveToGame();
-            _lpRenderMaps();
-            _mbShowToast('✓ Map saved to game!');
-            return;
-        }
-        this.showOverwriteDialog();
+        this.saveToGame();
+        _lpRenderMaps();
+        _mbShowToast('✓ Map saved to game!');
     },
 
     showOverwriteDialog() {
