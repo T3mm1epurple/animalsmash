@@ -2461,6 +2461,219 @@
         }
         .ar-back-btn:hover { color:#78716c; border-color:rgba(255,255,255,0.15); }
 
+        /* ═══════════════ MAP BUILDER ═══════════════════════════ */
+        #screen-mapbuilder {
+            background:#07060f; z-index:70; flex-direction:column; align-items:stretch;
+            justify-content:flex-start; padding:0; overflow:hidden;
+        }
+        #mb-topbar {
+            display:flex; align-items:center; gap:10px; padding:10px 14px;
+            background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.07);
+            flex-shrink:0; flex-wrap:wrap;
+        }
+        #mb-back-btn {
+            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+            color:#94a3b8; font-family:'Poppins',sans-serif; font-size:12px; font-weight:700;
+            padding:8px 14px; border-radius:10px; cursor:pointer; white-space:nowrap;
+            transition:all 0.18s;
+        }
+        #mb-back-btn:hover { background:rgba(255,255,255,0.1); color:#e2e8f0; }
+        .mb-title-input {
+            background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+            color:#f1f5f9; font-family:'Poppins',sans-serif; font-size:13px; font-weight:800;
+            padding:7px 12px; border-radius:10px; outline:none; min-width:140px; max-width:180px;
+            transition:border-color 0.2s;
+        }
+        .mb-title-input:focus { border-color:rgba(99,102,241,0.6); }
+        .mb-title-input::placeholder { color:#475569; }
+        .mb-desc-input {
+            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+            color:#94a3b8; font-family:'Poppins',sans-serif; font-size:11px; font-weight:600;
+            padding:7px 12px; border-radius:10px; outline:none; flex:1; min-width:120px;
+            transition:border-color 0.2s;
+        }
+        .mb-desc-input:focus { border-color:rgba(99,102,241,0.4); }
+        .mb-desc-input::placeholder { color:#334155; }
+        .mb-setting-row { display:flex; align-items:center; gap:6px; }
+        .mb-setting-lbl { font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; white-space:nowrap; }
+        .mb-sel {
+            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+            color:#e2e8f0; font-family:'Poppins',sans-serif; font-size:11px; font-weight:700;
+            padding:6px 10px; border-radius:8px; outline:none; cursor:pointer;
+            appearance:none; -webkit-appearance:none; min-width:90px;
+        }
+        .mb-sel option { background:#0d1022; }
+        .mb-color-swatch { width:30px; height:30px; border-radius:8px; border:2px solid rgba(255,255,255,0.15); cursor:pointer; padding:0; }
+        .mb-friction-wrap { display:flex; align-items:center; gap:6px; }
+        #mb-map-friction { width:70px; accent-color:#6366f1; }
+        .mb-topbar-actions { display:flex; gap:8px; margin-left:auto; }
+        .mb-action-btn {
+            font-family:'Poppins',sans-serif; font-size:11px; font-weight:800;
+            padding:8px 14px; border-radius:10px; border:none; cursor:pointer;
+            transition:all 0.18s; white-space:nowrap; letter-spacing:0.3px;
+        }
+        .mb-action-btn.save {
+            background:linear-gradient(135deg,#6366f1,#8b5cf6);
+            color:#fff; box-shadow:0 4px 14px rgba(99,102,241,0.4);
+        }
+        .mb-action-btn.save:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(99,102,241,0.55); }
+        .mb-action-btn.download {
+            background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+            color:#94a3b8;
+        }
+        .mb-action-btn.download:hover { background:rgba(255,255,255,0.12); color:#e2e8f0; }
+        #mb-editor {
+            display:flex; flex:1; min-height:0; overflow:hidden;
+        }
+        #mb-toolbar {
+            width:100px; flex-shrink:0; background:rgba(255,255,255,0.02);
+            border-right:1px solid rgba(255,255,255,0.06);
+            display:flex; flex-direction:column; gap:4px; padding:10px 8px;
+            overflow-y:auto;
+        }
+        .mb-tool-label {
+            font-size:9px; font-weight:800; color:#334155; text-transform:uppercase;
+            letter-spacing:0.8px; padding:4px 4px 0; margin-top:6px;
+        }
+        .mb-tool {
+            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
+            color:#64748b; font-family:'Poppins',sans-serif; font-size:10px; font-weight:700;
+            padding:9px 6px; border-radius:10px; cursor:pointer; text-align:center;
+            transition:all 0.18s; line-height:1.4;
+        }
+        .mb-tool:hover { background:rgba(255,255,255,0.09); color:#e2e8f0; border-color:rgba(255,255,255,0.15); }
+        .mb-tool.active { background:rgba(99,102,241,0.2); border-color:rgba(99,102,241,0.5); color:#a5b4fc; }
+        .mb-tool-icon { display:block; font-size:18px; margin-bottom:2px; }
+        #mb-canvas-wrap {
+            flex:1; min-width:0; position:relative; overflow:hidden; cursor:default;
+        }
+        #mb-canvas { display:block; width:100%; height:100%; }
+        #mb-coords {
+            position:absolute; bottom:8px; left:8px; font-size:10px; color:#475569;
+            font-family:monospace; pointer-events:none; background:rgba(0,0,0,0.5);
+            padding:3px 7px; border-radius:5px;
+        }
+        #mb-hint {
+            position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+            font-size:10px; color:#334155; font-family:'Poppins',sans-serif;
+            pointer-events:none; white-space:nowrap;
+        }
+        #mb-props {
+            width:220px; flex-shrink:0; background:rgba(255,255,255,0.02);
+            border-left:1px solid rgba(255,255,255,0.06);
+            display:flex; flex-direction:column; overflow:hidden;
+        }
+        #mb-props-title {
+            padding:12px 14px 8px; font-size:11px; font-weight:800; color:#64748b;
+            text-transform:uppercase; letter-spacing:0.8px; border-bottom:1px solid rgba(255,255,255,0.05);
+            flex-shrink:0;
+        }
+        #mb-props-content {
+            flex:1; overflow-y:auto; padding:10px 12px;
+        }
+        #mb-props-content::-webkit-scrollbar { width:4px; }
+        #mb-props-content::-webkit-scrollbar-track { background:transparent; }
+        #mb-props-content::-webkit-scrollbar-thumb { background:#334155; border-radius:2px; }
+        .mb-props-empty {
+            color:#475569; font-size:11px; text-align:center; padding:24px 12px;
+            font-family:'Poppins',sans-serif; line-height:1.6;
+        }
+        .mb-prop-header {
+            font-size:13px; font-weight:800; color:#c7d2fe; margin-bottom:10px;
+        }
+        .mb-prop-group {
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);
+            border-radius:10px; padding:10px; margin-bottom:8px;
+        }
+        .mb-prop-section {
+            font-size:9px; font-weight:800; color:#6366f1; text-transform:uppercase;
+            letter-spacing:0.8px; margin-bottom:8px;
+        }
+        .mb-prop-row {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:6px; gap:6px;
+        }
+        .mb-prop-row:last-child { margin-bottom:0; }
+        .mb-prop-row label {
+            font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase;
+            letter-spacing:0.5px; white-space:nowrap; flex-shrink:0;
+        }
+        .mb-prop-input {
+            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+            color:#e2e8f0; font-family:monospace; font-size:12px;
+            padding:4px 8px; border-radius:7px; outline:none; width:80px;
+            text-align:right; transition:border-color 0.2s;
+        }
+        .mb-prop-input:focus { border-color:rgba(99,102,241,0.5); }
+        .mb-prop-color {
+            width:36px; height:28px; border-radius:7px; border:2px solid rgba(255,255,255,0.15);
+            cursor:pointer; padding:0; background:none;
+        }
+        .mb-prop-actions {
+            display:flex; gap:6px; margin-top:4px;
+        }
+        .mb-prop-btn {
+            flex:1; font-family:'Poppins',sans-serif; font-size:10px; font-weight:800;
+            padding:8px; border-radius:9px; border:none; cursor:pointer;
+            transition:all 0.18s; text-transform:uppercase; letter-spacing:0.5px;
+        }
+        .mb-prop-btn.duplicate { background:rgba(99,102,241,0.15); color:#818cf8; border:1px solid rgba(99,102,241,0.25); }
+        .mb-prop-btn.duplicate:hover { background:rgba(99,102,241,0.25); }
+        .mb-prop-btn.delete { background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); }
+        .mb-prop-btn.delete:hover { background:rgba(239,68,68,0.22); }
+        /* Toast */
+        .mb-toast {
+            position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+            background:rgba(16,185,129,0.92); color:#fff; font-family:'Poppins',sans-serif;
+            font-size:13px; font-weight:700; padding:10px 22px; border-radius:30px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.4); opacity:0; transition:all 0.3s;
+            pointer-events:none; z-index:9999; white-space:nowrap;
+        }
+        .mb-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        /* Map builder button in menu */
+        .menu-btn-mapbuilder { background:linear-gradient(135deg,rgba(20,14,40,0.8),rgba(30,20,60,0.8)); border-color:rgba(139,92,246,0.3); }
+        .menu-btn-mapbuilder:hover { border-color:rgba(139,92,246,0.7); box-shadow:0 12px 40px rgba(139,92,246,0.3); }
+        /* Custom map card extras */
+        .lp-map-card.custom-map { border-color:rgba(139,92,246,0.25); }
+        .lp-map-card.custom-map.selected { border-color:#8b5cf6; box-shadow:0 0 0 1px rgba(139,92,246,0.3), 0 0 24px rgba(139,92,246,0.3); }
+        .lp-map-custom-badge {
+            font-size:8px; font-weight:800; color:#a78bfa; text-transform:uppercase;
+            letter-spacing:0.5px; margin-top:2px;
+        }
+        .lp-map-card-actions { display:flex; gap:4px; margin-top:5px; justify-content:center; }
+        .lp-map-action-btn {
+            font-size:9px; font-weight:800; padding:3px 7px; border-radius:6px; border:none;
+            cursor:pointer; font-family:'Poppins',sans-serif; transition:all 0.15s;
+            text-transform:uppercase; letter-spacing:0.4px;
+        }
+        .lp-map-action-btn.edit { background:rgba(99,102,241,0.2); color:#818cf8; }
+        .lp-map-action-btn.edit:hover { background:rgba(99,102,241,0.35); }
+        .lp-map-action-btn.del { background:rgba(239,68,68,0.15); color:#f87171; }
+        .lp-map-action-btn.del:hover { background:rgba(239,68,68,0.28); }
+        .lp-map-card.upload-card {
+            border-style:dashed; border-color:rgba(255,255,255,0.12);
+            background:rgba(255,255,255,0.02);
+        }
+        .lp-map-card.upload-card:hover { border-color:rgba(255,255,255,0.28); background:rgba(255,255,255,0.05); }
+        /* Emoji picker for map */
+        .mb-emoji-grid {
+            display:grid; grid-template-columns:repeat(6,1fr); gap:4px; margin-top:4px;
+        }
+        .mb-emoji-btn {
+            font-size:18px; padding:5px; border-radius:7px; border:1px solid transparent;
+            background:none; cursor:pointer; transition:all 0.15s; text-align:center;
+        }
+        .mb-emoji-btn:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); }
+        .mb-emoji-btn.active { background:rgba(99,102,241,0.2); border-color:rgba(99,102,241,0.4); }
+        /* Snap toggle */
+        .mb-snap-btn {
+            background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+            color:#64748b; font-family:'Poppins',sans-serif; font-size:10px; font-weight:700;
+            padding:6px 10px; border-radius:8px; cursor:pointer; transition:all 0.18s;
+            white-space:nowrap;
+        }
+        .mb-snap-btn.on { background:rgba(99,102,241,0.15); border-color:rgba(99,102,241,0.4); color:#a5b4fc; }
+
     </style>
 <!-- Code injected by Five-server -->
   </head>
@@ -2541,6 +2754,16 @@
                     </div>
                 </div>
                 <div class="menu-online-dot"></div>
+            </button>
+
+            <button class="menu-btn menu-btn-mapbuilder" onclick="MB.open(null)">
+                <div class="menu-btn-inner">
+                    <span class="menu-btn-icon">🗺️</span>
+                    <div class="menu-btn-text">
+                        <span class="menu-btn-label">Map Builder</span>
+                        <span class="menu-btn-sub">Create custom stages · share maps</span>
+                    </div>
+                </div>
             </button>
 
             <button class="menu-btn menu-btn-changelog" onclick="openChangelog()">
@@ -3327,6 +3550,117 @@
     <div id="screen-char-select" class="hidden"></div>
     <div id="screen-rules" class="hidden"></div>
     <div id="screen-map-select" class="hidden"></div>
+
+    <!-- ═══════════════ MAP BUILDER SCREEN ═══════════════ -->
+    <div id="screen-mapbuilder" class="screen hidden">
+
+        <!-- Top bar -->
+        <div id="mb-topbar">
+            <button id="mb-back-btn" onclick="MB.close()">← Back</button>
+
+            <input class="mb-title-input" id="mb-map-name" placeholder="Map Name" maxlength="32"
+                oninput="MB.map.name=this.value" />
+            <input class="mb-desc-input" id="mb-map-desc" placeholder="Description…" maxlength="80"
+                oninput="MB.map.desc=this.value" />
+
+            <div class="mb-setting-row">
+                <span class="mb-setting-lbl">Size</span>
+                <select class="mb-sel" id="mb-map-size" onchange="MB.updateMapSetting('size',this.value)">
+                    <option value="Small">Small</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="Large">Large</option>
+                    <option value="Massive">Massive</option>
+                </select>
+            </div>
+
+            <div class="mb-setting-row">
+                <span class="mb-setting-lbl">BG</span>
+                <input type="color" class="mb-color-swatch" id="mb-map-bg" value="#1a1a2e"
+                    oninput="MB.updateMapSetting('bg',this.value)" />
+            </div>
+
+            <div class="mb-setting-row mb-friction-wrap">
+                <span class="mb-setting-lbl">Friction</span>
+                <input type="range" id="mb-map-friction" min="0.6" max="0.99" step="0.01" value="0.82"
+                    oninput="MB.updateMapSetting('friction',+this.value);document.getElementById('mb-friction-val').textContent=(+this.value).toFixed(2)" />
+                <span id="mb-friction-val" style="font-size:10px;color:#64748b;font-weight:700;min-width:30px;">0.82</span>
+            </div>
+
+            <div class="mb-setting-row">
+                <span class="mb-setting-lbl">Emoji</span>
+                <select class="mb-sel" id="mb-map-emoji" style="min-width:60px;"
+                    onchange="MB.map.emoji=this.value">
+                    <option>🗺️</option><option>⚔️</option><option>🌋</option><option>🧊</option>
+                    <option>🎯</option><option>🌪️</option><option>🏰</option><option>🏝️</option>
+                    <option>⚡</option><option>🌆</option><option>🌊</option><option>🔥</option>
+                    <option>❄️</option><option>🌌</option><option>🏔️</option><option>🎪</option>
+                    <option>🌈</option><option>🏗️</option><option>🗻</option><option>🌑</option>
+                </select>
+            </div>
+
+            <button class="mb-snap-btn on" id="mb-snap-btn" onclick="MB.toggleSnap()"
+                title="Toggle grid snap (G)">⊞ Snap</button>
+
+            <div class="mb-topbar-actions">
+                <button class="mb-action-btn download" onclick="MB.download()">⬇ Download</button>
+                <button class="mb-action-btn save" onclick="MB.addToGame()">✦ Save to Game</button>
+            </div>
+        </div>
+
+        <!-- Editor area -->
+        <div id="mb-editor">
+
+            <!-- Left toolbar -->
+            <div id="mb-toolbar">
+                <span class="mb-tool-label">Tools</span>
+                <button class="mb-tool active" id="mb-tool-select" onclick="MB.setTool('select')">
+                    <span class="mb-tool-icon">↖</span>Select
+                </button>
+                <button class="mb-tool" id="mb-tool-platform" onclick="MB.setTool('platform')">
+                    <span class="mb-tool-icon">▬</span>Platform
+                </button>
+
+                <span class="mb-tool-label">Hazards</span>
+                <button class="mb-tool" id="mb-tool-lava" onclick="MB.setTool('lava')">
+                    <span class="mb-tool-icon">🌋</span>Lava
+                </button>
+                <button class="mb-tool" id="mb-tool-bumper" onclick="MB.setTool('bumper')">
+                    <span class="mb-tool-icon">🎯</span>Bumper
+                </button>
+                <button class="mb-tool" id="mb-tool-wind" onclick="MB.setTool('wind')">
+                    <span class="mb-tool-icon">🌪️</span>Wind
+                </button>
+                <button class="mb-tool" id="mb-tool-geyser" onclick="MB.setTool('geyser')">
+                    <span class="mb-tool-icon">💦</span>Geyser
+                </button>
+
+                <span class="mb-tool-label" style="margin-top:10px;">View</span>
+                <button class="mb-tool" onclick="MB.fitCamera()" title="Fit map to view">
+                    <span class="mb-tool-icon">⊡</span>Fit
+                </button>
+            </div>
+
+            <!-- Canvas -->
+            <div id="mb-canvas-wrap">
+                <canvas id="mb-canvas"></canvas>
+                <div id="mb-coords">x:0 y:0</div>
+                <div id="mb-hint">Scroll to zoom · Drag empty space to pan · Del to delete</div>
+            </div>
+
+            <!-- Right properties panel -->
+            <div id="mb-props">
+                <div id="mb-props-title">Properties</div>
+                <div id="mb-props-content">
+                    <div class="mb-props-empty">
+                        <div style="font-size:32px;margin-bottom:8px;">↖</div>
+                        <div>Select an object to edit its properties</div>
+                        <div style="margin-top:12px;font-size:10px;opacity:0.5;">Or use tools on the left to place objects</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /mb-editor -->
+    </div><!-- /screen-mapbuilder -->
 
     <!-- Game Over -->
     <div id="screen-game-over" class="screen hidden" style="flex-direction:column;justify-content:flex-start;align-items:center;gap:0;padding:0;overflow:hidden;">
@@ -7737,6 +8071,8 @@ const MAPS = [
     },
 ];
 
+// Number of built-in maps — custom maps are appended after this index
+const _MB_BUILTIN_MAP_COUNT = MAPS.length;
 
 const ITEM_TYPES = {
     BLASTER:{type:'gun',name:'🔫 Blaster',ammo:5,damage:15,knockback:5,projType:'normal',color:'#ef4444'},
@@ -8308,6 +8644,7 @@ function hideTooltip(){ tooltipEl.style.opacity=0; _tooltipChar=null; tooltipEl.
 function hideAllScreens(){
     document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
     document.getElementById('screen-local').classList.add('hidden');
+    document.getElementById('screen-mapbuilder')?.classList.add('hidden');
     document.getElementById('screen-arcade-pick')?.classList.add('hidden');
     document.getElementById('screen-arcade')?.classList.add('hidden');
     document.getElementById('screen-bossrush')?.classList.add('hidden');
@@ -9587,29 +9924,50 @@ function _lpRenderFighters(){
 function _lpRenderMaps(){
     const grid=document.getElementById('lp-map-grid');
     if(!grid) return;
-    // Build fresh only if empty, otherwise just update selected state
-    if(grid.children.length === 0){
-        MAPS.forEach((map,idx)=>{
-            const div=document.createElement('div');
-            div.className=`lp-map-card${idx===selectedMapIdx?' selected':''}`;
-            div.style.animationDelay=`${idx*0.025}s`;
-            div.id=`lp-mc-${idx}`;
-            div.innerHTML=`<span class="lp-map-emoji">${map.emoji}</span><div class="lp-map-name">${map.name}</div><div class="lp-map-size">${map.size}</div>`;
-            div.onclick=()=>{ selectedMapIdx=idx; _lpUpdateMapSelected(); };
-            div.onmouseenter=()=>showMapTooltip(idx);
-            div.onmouseleave=()=>hideTooltip();
-            grid.appendChild(div);
-        });
-    } else {
-        _lpUpdateMapSelected();
-    }
+    // Always rebuild so custom maps appear after being added/removed
+    grid.innerHTML='';
+    MAPS.forEach((map,idx)=>{
+        const isCustom=idx>=_MB_BUILTIN_MAP_COUNT;
+        const div=document.createElement('div');
+        div.className=`lp-map-card${isCustom?' custom-map':''}${idx===selectedMapIdx?' selected':''}`;
+        div.style.animationDelay=`${idx*0.025}s`;
+        div.id=`lp-mc-${idx}`;
+        let inner=`<span class="lp-map-emoji">${map.emoji}</span><div class="lp-map-name">${map.name}</div><div class="lp-map-size">${map.size}</div>`;
+        if(isCustom){
+            inner+=`<div class="lp-map-custom-badge">✦ Custom</div>`;
+            inner+=`<div class="lp-map-card-actions">
+                <button class="lp-map-action-btn edit" onclick="event.stopPropagation();MB._openFromStage('${map._id}')">✏ Edit</button>
+                <button class="lp-map-action-btn del" onclick="event.stopPropagation();MB.deleteCustomMap('${map._id}')">✕</button>
+            </div>`;
+        }
+        div.innerHTML=inner;
+        div.onclick=()=>{ selectedMapIdx=idx; _lpUpdateMapSelected(); };
+        div.onmouseenter=()=>showMapTooltip(idx);
+        div.onmouseleave=()=>hideTooltip();
+        grid.appendChild(div);
+    });
+    // Upload / New Map card
+    const newDiv=document.createElement('div');
+    newDiv.className='lp-map-card upload-card';
+    newDiv.innerHTML=`<span class="lp-map-emoji">🗺️</span><div class="lp-map-name">New / Upload</div><div class="lp-map-size">Custom map</div>`;
+    newDiv.onclick=()=>_mbShowImportMenu();
+    grid.appendChild(newDiv);
 }
 
 function _lpUpdateMapSelected(){
     MAPS.forEach((_,idx)=>{
         const card=document.getElementById(`lp-mc-${idx}`);
-        if(card) card.className=`lp-map-card${idx===selectedMapIdx?' selected':''}`;
+        if(!card) return;
+        const isCustom=idx>=_MB_BUILTIN_MAP_COUNT;
+        card.className=`lp-map-card${isCustom?' custom-map':''}${idx===selectedMapIdx?' selected':''}`;
     });
+}
+
+function _mbShowImportMenu(){
+    // Small inline menu: create new or upload from file
+    const opts=['Create New Map','Upload from File (.json)'];
+    const choice=window.confirm('Create a new map?\nPress OK to create, Cancel to upload a file.');
+    if(choice){ MB.open(null); } else { mbUploadMap(); }
 }
 
 // ── Rules panel ──────────────────────────────────────────
@@ -15663,6 +16021,772 @@ window.netMatch = (function () {
         }
     };
 })();
+
+// ═══════════════════════════════════════════════════════════════
+//  MAP BUILDER  (MB)
+// ═══════════════════════════════════════════════════════════════
+const MB = {
+    // ── Config ────────────────────────────────────────────────
+    SIZES: { Small:{w:900,h:720}, Medium:{w:1200,h:800}, Large:{w:1600,h:1000}, Massive:{w:2500,h:1800} },
+    GRID: 10,
+    HANDLE_PX: 7,      // handle size in screen pixels
+
+    // ── State ─────────────────────────────────────────────────
+    map: null,         // current map data being edited
+    mapId: null,       // localStorage id for currently edited custom map (null = new)
+    _fromLocal: false, // true if opened from the local play stage selector
+
+    tool: 'select',    // 'select'|'platform'|'lava'|'bumper'|'wind'|'geyser'
+    snapEnabled: true,
+
+    sel: null,         // { type:'platform'|'hazard', idx:number }
+
+    // Draw state (drag-to-create)
+    isDrawing: false,
+    drawStart: {x:0,y:0},
+    drawCur:   {x:0,y:0},
+
+    // Drag (move selection)
+    isDragging: false,
+    dragStart:  {mx:0,my:0,ox:0,oy:0},
+
+    // Resize
+    isResizing: false,
+    resizeHandle: '',
+    resizeStart: {mx:0,my:0,ox:0,oy:0,ow:0,oh:0},
+
+    // Pan
+    isPanning: false,
+    panStart:  {mx:0,my:0,cx:0,cy:0},
+
+    // Camera
+    cam: {x:600,y:400,zoom:0.7},
+
+    // Canvas
+    canvas: null, ctx: null, animFrame: null,
+
+    // Bound event handlers (kept so we can remove them)
+    _evMD: null, _evMM: null, _evMU: null, _evWH: null, _evRS: null, _evKD: null,
+
+    // ── Map management ─────────────────────────────────────────
+    newMap() {
+        this.map = {
+            name:'My Map', emoji:'🗺️', size:'Medium', desc:'',
+            bg:'#1a1a2e', friction:0.82,
+            platforms:[], hazards:[],
+            _custom:true, _id:'custom_'+Date.now()
+        };
+        this.mapId = null;
+        this.sel = null;
+    },
+
+    loadMap(id) {
+        const found = this.getCustomMaps().find(m=>m._id===id);
+        if (found) {
+            this.map = JSON.parse(JSON.stringify(found));
+            this.mapId = id;
+            this.sel = null;
+        } else {
+            this.newMap();
+        }
+    },
+
+    getCustomMaps() {
+        try { return JSON.parse(localStorage.getItem('sas_custom_maps')||'[]'); }
+        catch(e) { return []; }
+    },
+
+    saveToGame() {
+        this.map.name = document.getElementById('mb-map-name').value.trim() || 'My Map';
+        this.map.desc = document.getElementById('mb-map-desc').value.trim();
+        this.map.emoji = document.getElementById('mb-map-emoji').value || '🗺️';
+        const maps = this.getCustomMaps();
+        const idx = maps.findIndex(m=>m._id===this.map._id);
+        if (idx>=0) { maps[idx]=JSON.parse(JSON.stringify(this.map)); }
+        else { maps.push(JSON.parse(JSON.stringify(this.map))); }
+        localStorage.setItem('sas_custom_maps', JSON.stringify(maps));
+        _mbSyncCustomMaps();
+    },
+
+    deleteCustomMap(id) {
+        if (!confirm('Delete this custom map permanently?')) return;
+        const maps = this.getCustomMaps().filter(m=>m._id!==id);
+        localStorage.setItem('sas_custom_maps', JSON.stringify(maps));
+        _mbSyncCustomMaps();
+        // Make sure selectedMapIdx is still valid
+        if (selectedMapIdx >= MAPS.length) selectedMapIdx = 0;
+        _lpRenderMaps();
+        _mbShowToast('Map deleted.');
+    },
+
+    // ── Tool management ───────────────────────────────────────
+    setTool(t) {
+        this.tool = t;
+        this.sel = null;
+        document.querySelectorAll('.mb-tool').forEach(b=>b.classList.remove('active'));
+        const btn = document.getElementById('mb-tool-'+t);
+        if (btn) btn.classList.add('active');
+        this.renderProps();
+        if (this.canvas) {
+            this.canvas.style.cursor = t==='select' ? 'default' : 'crosshair';
+        }
+    },
+
+    toggleSnap() {
+        this.snapEnabled = !this.snapEnabled;
+        const btn = document.getElementById('mb-snap-btn');
+        if (btn) {
+            btn.classList.toggle('on', this.snapEnabled);
+            btn.textContent = this.snapEnabled ? '⊞ Snap' : '⊡ Free';
+        }
+    },
+
+    // ── Coordinate helpers ────────────────────────────────────
+    snap(v) {
+        if (!this.snapEnabled) return Math.round(v);
+        return Math.round(v / this.GRID) * this.GRID;
+    },
+
+    worldToScreen(wx, wy) {
+        const c = this.canvas;
+        return {
+            x: (wx - this.cam.x) * this.cam.zoom + c.width  / 2,
+            y: (wy - this.cam.y) * this.cam.zoom + c.height / 2
+        };
+    },
+
+    screenToWorld(sx, sy) {
+        const c = this.canvas;
+        return {
+            x: (sx - c.width  / 2) / this.cam.zoom + this.cam.x,
+            y: (sy - c.height / 2) / this.cam.zoom + this.cam.y
+        };
+    },
+
+    fitCamera() {
+        const sz = this.SIZES[this.map.size] || this.SIZES.Medium;
+        const cw = this.canvas.width, ch = this.canvas.height;
+        const margin = 40;
+        const zx = (cw - margin*2) / sz.w;
+        const zy = (ch - margin*2) / sz.h;
+        this.cam.zoom = Math.min(zx, zy, 1);
+        this.cam.x = sz.w / 2;
+        this.cam.y = sz.h / 2;
+    },
+
+    // ── Selection helpers ─────────────────────────────────────
+    hitTest(wx, wy) {
+        // Test from top layer down
+        for (let i=this.map.platforms.length-1;i>=0;i--) {
+            const p=this.map.platforms[i];
+            if(wx>=p.x&&wx<=p.x+p.w&&wy>=p.y&&wy<=p.y+p.h) return {type:'platform',idx:i};
+        }
+        for (let i=this.map.hazards.length-1;i>=0;i--) {
+            const h=this.map.hazards[i];
+            if(wx>=h.x&&wx<=h.x+h.w&&wy>=h.y&&wy<=h.y+h.h) return {type:'hazard',idx:i};
+        }
+        return null;
+    },
+
+    getSelObj() {
+        if (!this.sel) return null;
+        const arr = this.sel.type==='platform' ? this.map.platforms : this.map.hazards;
+        return arr[this.sel.idx] || null;
+    },
+
+    getHandleAt(obj, sx, sy) {
+        const hs = this.HANDLE_PX + 3;
+        const pts = {
+            nw: this.worldToScreen(obj.x,       obj.y),
+            n:  this.worldToScreen(obj.x+obj.w/2, obj.y),
+            ne: this.worldToScreen(obj.x+obj.w,  obj.y),
+            e:  this.worldToScreen(obj.x+obj.w,  obj.y+obj.h/2),
+            se: this.worldToScreen(obj.x+obj.w,  obj.y+obj.h),
+            s:  this.worldToScreen(obj.x+obj.w/2, obj.y+obj.h),
+            sw: this.worldToScreen(obj.x,         obj.y+obj.h),
+            w:  this.worldToScreen(obj.x,         obj.y+obj.h/2)
+        };
+        for (const [name,pt] of Object.entries(pts)) {
+            if (Math.abs(sx-pt.x)<=hs && Math.abs(sy-pt.y)<=hs) return name;
+        }
+        return null;
+    },
+
+    // ── Render loop ───────────────────────────────────────────
+    startRenderLoop() {
+        const loop = () => {
+            this.render();
+            this.animFrame = requestAnimationFrame(loop);
+        };
+        this.animFrame = requestAnimationFrame(loop);
+    },
+
+    render() {
+        const c = this.canvas, ctx = this.ctx;
+        if (!c||!ctx) return;
+        const W=c.width, H=c.height;
+        ctx.clearRect(0,0,W,H);
+
+        // Outer background
+        ctx.fillStyle='#050409';
+        ctx.fillRect(0,0,W,H);
+
+        const sz = this.SIZES[this.map.size] || this.SIZES.Medium;
+        const tx = W/2 - this.cam.x*this.cam.zoom;
+        const ty = H/2 - this.cam.y*this.cam.zoom;
+
+        ctx.save();
+        ctx.translate(tx, ty);
+        ctx.scale(this.cam.zoom, this.cam.zoom);
+
+        // Map background
+        ctx.fillStyle = this.map.bg || '#1a1a2e';
+        ctx.fillRect(0, 0, sz.w, sz.h);
+
+        // Grid
+        const gStep = this.GRID * 5;
+        ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+        ctx.lineWidth = 1/this.cam.zoom;
+        for (let x=0;x<=sz.w;x+=gStep) { ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,sz.h);ctx.stroke(); }
+        for (let y=0;y<=sz.h;y+=gStep) { ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(sz.w,y);ctx.stroke(); }
+
+        // Map border
+        ctx.strokeStyle='rgba(255,255,255,0.18)';
+        ctx.lineWidth=2/this.cam.zoom;
+        ctx.strokeRect(0,0,sz.w,sz.h);
+
+        // Hazards
+        this.map.hazards.forEach((h,i)=>this._drawHazard(h,i));
+        // Platforms
+        this.map.platforms.forEach((p,i)=>this._drawPlatform(p,i));
+
+        // Draw-in-progress preview
+        if (this.isDrawing && this.tool!=='select') {
+            const x=Math.min(this.drawStart.x,this.drawCur.x);
+            const y=Math.min(this.drawStart.y,this.drawCur.y);
+            const w=Math.abs(this.drawCur.x-this.drawStart.x);
+            const h=Math.abs(this.drawCur.y-this.drawStart.y);
+            ctx.fillStyle='rgba(255,255,255,0.1)';
+            ctx.strokeStyle='rgba(255,255,255,0.7)';
+            ctx.lineWidth=1.5/this.cam.zoom;
+            ctx.setLineDash([6/this.cam.zoom,4/this.cam.zoom]);
+            ctx.fillRect(x,y,w,h);
+            ctx.strokeRect(x,y,w,h);
+            ctx.setLineDash([]);
+        }
+
+        ctx.restore();
+    },
+
+    _drawPlatform(p, idx) {
+        const ctx=this.ctx, z=this.cam.zoom;
+        const isSel=this.sel&&this.sel.type==='platform'&&this.sel.idx===idx;
+        ctx.fillStyle=p.color||'#4a4e69';
+        ctx.beginPath();
+        // Simple rounded rect
+        const r=Math.min(4,p.h/2);
+        ctx.roundRect(p.x,p.y,p.w,p.h,r);
+        ctx.fill();
+        // Top highlight
+        ctx.fillStyle='rgba(255,255,255,0.12)';
+        ctx.fillRect(p.x+r,p.y,p.w-r*2,2);
+        // Moving arrow
+        if (p.vx||p.vy) {
+            const arrow=p.vx>0?'→':p.vx<0?'←':p.vy>0?'↓':'↑';
+            ctx.fillStyle='rgba(251,191,36,0.9)';
+            ctx.font=`bold ${Math.min(14,p.h*0.9)/z}px sans-serif`;
+            ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(arrow,p.x+p.w/2,p.y+p.h/2);
+            ctx.textBaseline='alphabetic';
+        }
+        if (isSel) {
+            ctx.strokeStyle='#818cf8';
+            ctx.lineWidth=2/z;
+            ctx.strokeRect(p.x-1/z,p.y-1/z,p.w+2/z,p.h+2/z);
+            this._drawHandles(p.x,p.y,p.w,p.h);
+        }
+    },
+
+    _drawHazard(h, idx) {
+        const ctx=this.ctx, z=this.cam.zoom;
+        const isSel=this.sel&&this.sel.type==='hazard'&&this.sel.idx===idx;
+        const fills={lava:'rgba(234,88,12,0.55)',bumper:'rgba(217,70,239,0.6)',wind:'rgba(148,163,184,0.12)',geyser:'rgba(14,165,233,0.4)'};
+        const labels={lava:'🌋',bumper:'🎯',wind:'🌪️',geyser:'💦'};
+        ctx.fillStyle=h.color||(fills[h.type]||'rgba(255,0,0,0.4)');
+        if (h.type==='bumper') {
+            ctx.beginPath();
+            ctx.arc(h.x+h.w/2,h.y+h.h/2,Math.min(h.w,h.h)/2,0,Math.PI*2);
+            ctx.fill();
+            if (isSel) { ctx.strokeStyle='#f59e0b';ctx.lineWidth=2/z;ctx.stroke(); }
+        } else {
+            ctx.fillRect(h.x,h.y,h.w,h.h);
+            // Pattern overlay for wind
+            if (h.type==='wind') {
+                ctx.strokeStyle='rgba(148,163,184,0.25)';
+                ctx.lineWidth=1.5/z;
+                for(let y=h.y+10;y<h.y+h.h;y+=20){
+                    ctx.beginPath();ctx.moveTo(h.x,y);ctx.lineTo(h.x+h.w,y);ctx.stroke();
+                }
+            }
+            if (isSel) {
+                ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2/z;
+                ctx.strokeRect(h.x-1/z,h.y-1/z,h.w+2/z,h.h+2/z);
+            }
+        }
+        // Emoji label
+        const fs=Math.max(14,Math.min(h.w,h.h)*0.4)/z;
+        ctx.font=`${fs}px serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(labels[h.type]||'?',h.x+h.w/2,h.y+h.h/2);
+        ctx.textBaseline='alphabetic';
+        if (isSel && h.type!=='bumper') this._drawHandles(h.x,h.y,h.w,h.h);
+    },
+
+    _drawHandles(x,y,w,h) {
+        const ctx=this.ctx, z=this.cam.zoom;
+        const s=this.HANDLE_PX/z;
+        const pts=[[x,y],[x+w/2,y],[x+w,y],[x+w,y+h/2],[x+w,y+h],[x+w/2,y+h],[x,y+h],[x,y+h/2]];
+        ctx.fillStyle='#fff'; ctx.strokeStyle='#6366f1'; ctx.lineWidth=1/z;
+        pts.forEach(([hx,hy])=>{ ctx.fillRect(hx-s/2,hy-s/2,s,s); ctx.strokeRect(hx-s/2,hy-s/2,s,s); });
+    },
+
+    // ── Mouse events ──────────────────────────────────────────
+    onMouseDown(e) {
+        const rect=this.canvas.getBoundingClientRect();
+        const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
+        const wp=this.screenToWorld(sx,sy);
+        const wx=this.snap(wp.x), wy=this.snap(wp.y);
+
+        if (e.button===1) { // middle mouse = pan
+            this.isPanning=true;
+            this.panStart={mx:sx,my:sy,cx:this.cam.x,cy:this.cam.y};
+            e.preventDefault(); return;
+        }
+        if (e.button!==0) return;
+
+        if (this.tool==='select') {
+            const obj=this.getSelObj();
+            if (obj) {
+                const handle=this.getHandleAt(obj,sx,sy);
+                if (handle) {
+                    this.isResizing=true; this.resizeHandle=handle;
+                    this.resizeStart={mx:sx,my:sy,ox:obj.x,oy:obj.y,ow:obj.w,oh:obj.h};
+                    return;
+                }
+            }
+            const hit=this.hitTest(wp.x,wp.y);
+            if (hit) {
+                this.sel=hit;
+                const o=this.getSelObj();
+                this.isDragging=true;
+                this.dragStart={mx:sx,my:sy,ox:o.x,oy:o.y};
+                this.renderProps();
+            } else {
+                this.sel=null; this.renderProps();
+                this.isPanning=true;
+                this.panStart={mx:sx,my:sy,cx:this.cam.x,cy:this.cam.y};
+            }
+        } else {
+            this.isDrawing=true;
+            this.drawStart={x:wx,y:wy};
+            this.drawCur  ={x:wx,y:wy};
+        }
+    },
+
+    onMouseMove(e) {
+        const rect=this.canvas.getBoundingClientRect();
+        const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
+
+        // Update coords display
+        const wp0=this.screenToWorld(sx,sy);
+        const coordEl=document.getElementById('mb-coords');
+        if(coordEl) coordEl.textContent=`x:${Math.round(wp0.x)}  y:${Math.round(wp0.y)}`;
+
+        if (this.isPanning) {
+            const dx=(sx-this.panStart.mx)/this.cam.zoom;
+            const dy=(sy-this.panStart.my)/this.cam.zoom;
+            this.cam.x=this.panStart.cx-dx;
+            this.cam.y=this.panStart.cy-dy;
+            return;
+        }
+
+        const wp=this.screenToWorld(sx,sy);
+        const wx=this.snap(wp.x), wy=this.snap(wp.y);
+
+        if (this.isDragging && this.sel) {
+            const obj=this.getSelObj();
+            if (obj) {
+                obj.x=this.snap(this.dragStart.ox+(sx-this.dragStart.mx)/this.cam.zoom);
+                obj.y=this.snap(this.dragStart.oy+(sy-this.dragStart.my)/this.cam.zoom);
+                this.renderProps();
+            }
+        } else if (this.isResizing && this.sel) {
+            const obj=this.getSelObj();
+            if (obj) {
+                const dxW=(sx-this.resizeStart.mx)/this.cam.zoom;
+                const dyW=(sy-this.resizeStart.my)/this.cam.zoom;
+                const h=this.resizeHandle;
+                let nx=this.resizeStart.ox,ny=this.resizeStart.oy,nw=this.resizeStart.ow,nh=this.resizeStart.oh;
+                if(h.includes('e')) nw=Math.max(10,this.snap(this.resizeStart.ow+dxW));
+                if(h.includes('s')) nh=Math.max(10,this.snap(this.resizeStart.oh+dyW));
+                if(h.includes('w')){ const nw2=Math.max(10,this.snap(this.resizeStart.ow-dxW)); nx=this.resizeStart.ox+(this.resizeStart.ow-nw2); nw=nw2; }
+                if(h.includes('n')){ const nh2=Math.max(10,this.snap(this.resizeStart.oh-dyW)); ny=this.resizeStart.oy+(this.resizeStart.oh-nh2); nh=nh2; }
+                obj.x=nx;obj.y=ny;obj.w=nw;obj.h=nh;
+                this.renderProps();
+            }
+        } else if (this.isDrawing) {
+            this.drawCur={x:wx,y:wy};
+        } else if (this.tool==='select') {
+            // Update cursor
+            const selObj=this.getSelObj();
+            let cur='default';
+            if (selObj) {
+                const handle=this.getHandleAt(selObj,sx,sy);
+                if (handle) {
+                    const cMap={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
+                    cur=cMap[handle]||'default';
+                } else {
+                    const hit=this.hitTest(wp.x,wp.y);
+                    cur=hit?'move':'default';
+                }
+            } else {
+                cur=this.hitTest(wp.x,wp.y)?'move':'default';
+            }
+            this.canvas.style.cursor=cur;
+        }
+    },
+
+    onMouseUp(e) {
+        if (this.isPanning) { this.isPanning=false; return; }
+
+        if (this.isDrawing) {
+            this.isDrawing=false;
+            const x=Math.min(this.drawStart.x,this.drawCur.x);
+            const y=Math.min(this.drawStart.y,this.drawCur.y);
+            const w=Math.abs(this.drawCur.x-this.drawStart.x);
+            const h=Math.abs(this.drawCur.y-this.drawStart.y);
+            if (w>=10&&h>=10) this._addObject(this.tool,x,y,w,h);
+        }
+        this.isDragging=false;
+        this.isResizing=false;
+    },
+
+    onWheel(e) {
+        e.preventDefault();
+        const factor=e.deltaY>0?0.88:1.14;
+        const rect=this.canvas.getBoundingClientRect();
+        const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
+        const wp=this.screenToWorld(sx,sy);
+        this.cam.zoom=Math.max(0.08,Math.min(5,this.cam.zoom*factor));
+        const wp2=this.screenToWorld(sx,sy);
+        this.cam.x+=wp.x-wp2.x;
+        this.cam.y+=wp.y-wp2.y;
+    },
+
+    onKeyDown(e) {
+        if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+        if (e.key==='Delete'||e.key==='Backspace') { e.preventDefault(); this.deleteSelected(); }
+        if ((e.key==='d'||e.key==='D')&&(e.ctrlKey||e.metaKey)) { e.preventDefault(); this.duplicateSelected(); }
+        if (e.key==='v'||e.key==='Escape') this.setTool('select');
+        if (e.key==='p'||e.key==='P') this.setTool('platform');
+        if (e.key==='l'||e.key==='L') this.setTool('lava');
+        if (e.key==='b'||e.key==='B') this.setTool('bumper');
+        if (e.key==='w'||e.key==='W') this.setTool('wind');
+        if (e.key==='g'||e.key==='G') this.toggleSnap();
+        if (e.key==='f'||e.key==='F') this.fitCamera();
+        // Arrow-key nudge
+        if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) {
+            const obj=this.getSelObj();
+            if (obj) {
+                const step=e.shiftKey?50:this.GRID;
+                if(e.key==='ArrowLeft')  obj.x-=step;
+                if(e.key==='ArrowRight') obj.x+=step;
+                if(e.key==='ArrowUp')    obj.y-=step;
+                if(e.key==='ArrowDown')  obj.y+=step;
+                e.preventDefault();
+                this.renderProps();
+            }
+        }
+    },
+
+    // ── Object creation ───────────────────────────────────────
+    _addObject(type,x,y,w,h) {
+        if (type==='platform') {
+            this.map.platforms.push({x,y,w,h,color:'#4a4e69'});
+            this.sel={type:'platform',idx:this.map.platforms.length-1};
+        } else {
+            const defCol={lava:'#ea580c',bumper:'#d946ef',wind:'rgba(148,163,184,0.07)',geyser:'#0ea5e9'};
+            const obj={x,y,w,h,type,color:defCol[type]||'#fff'};
+            if (type==='wind') { obj.vy=-0.7; obj.vx=0; }
+            if (type==='geyser') { obj.vy=-12; }
+            this.map.hazards.push(obj);
+            this.sel={type:'hazard',idx:this.map.hazards.length-1};
+        }
+        this.setTool('select');
+        this.renderProps();
+    },
+
+    deleteSelected() {
+        if (!this.sel) return;
+        if (this.sel.type==='platform') this.map.platforms.splice(this.sel.idx,1);
+        else this.map.hazards.splice(this.sel.idx,1);
+        this.sel=null; this.renderProps();
+    },
+
+    duplicateSelected() {
+        if (!this.sel) return;
+        const obj=this.getSelObj(); if(!obj) return;
+        const copy=JSON.parse(JSON.stringify(obj));
+        copy.x+=20; copy.y+=20;
+        if (this.sel.type==='platform') {
+            this.map.platforms.push(copy);
+            this.sel={type:'platform',idx:this.map.platforms.length-1};
+        } else {
+            this.map.hazards.push(copy);
+            this.sel={type:'hazard',idx:this.map.hazards.length-1};
+        }
+        this.renderProps();
+    },
+
+    // ── Properties panel ─────────────────────────────────────
+    renderProps() {
+        const panel=document.getElementById('mb-props-content');
+        if (!panel) return;
+        const obj=this.getSelObj();
+        if (!obj) {
+            panel.innerHTML=`<div class="mb-props-empty"><div style="font-size:30px;margin-bottom:8px;">↖</div><div>Select an object<br>to edit its properties</div><div style="margin-top:10px;font-size:9px;opacity:0.4;">Del = delete · Ctrl+D = duplicate<br>Arrow keys = nudge · Shift+Arrow = big nudge</div></div>`;
+            return;
+        }
+        const isPlat=this.sel.type==='platform';
+        const isMoving=!!(obj.vx||obj.vy);
+        let h=`<div class="mb-prop-header">${isPlat?'▬ Platform':'⚠️ '+obj.type.charAt(0).toUpperCase()+obj.type.slice(1)}</div>`;
+
+        h+=`<div class="mb-prop-group">
+<div class="mb-prop-row"><label>X</label><input type="number" class="mb-prop-input" value="${Math.round(obj.x)}" onchange="MB._sp('x',+this.value);MB.renderProps()"/></div>
+<div class="mb-prop-row"><label>Y</label><input type="number" class="mb-prop-input" value="${Math.round(obj.y)}" onchange="MB._sp('y',+this.value);MB.renderProps()"/></div>
+<div class="mb-prop-row"><label>W</label><input type="number" class="mb-prop-input" value="${Math.round(obj.w)}" onchange="MB._sp('w',Math.max(10,+this.value));MB.renderProps()"/></div>
+<div class="mb-prop-row"><label>H</label><input type="number" class="mb-prop-input" value="${Math.round(obj.h)}" onchange="MB._sp('h',Math.max(4,+this.value));MB.renderProps()"/></div>
+</div>`;
+
+        h+=`<div class="mb-prop-group"><div class="mb-prop-row"><label>Color</label><input type="color" class="mb-prop-color" value="${this._hex(obj.color||'#888888')}" onchange="MB._sp('color',this.value)"/></div></div>`;
+
+        if (isPlat) {
+            h+=`<div class="mb-prop-group"><div class="mb-prop-section">Moving Platform</div>
+<div class="mb-prop-row"><label>Moving</label><input type="checkbox" ${isMoving?'checked':''} onchange="MB._toggleMoving(this.checked)"/></div>`;
+            if (isMoving) {
+                h+=`<div class="mb-prop-row"><label>Vel X</label><input type="number" step="0.1" class="mb-prop-input" value="${+(obj.vx||0).toFixed(2)}" onchange="MB._sp('vx',+this.value)"/></div>
+<div class="mb-prop-row"><label>Vel Y</label><input type="number" step="0.1" class="mb-prop-input" value="${+(obj.vy||0).toFixed(2)}" onchange="MB._sp('vy',+this.value)"/></div>`;
+                if (obj.vx) h+=`<div class="mb-prop-row"><label>Min X</label><input type="number" class="mb-prop-input" value="${obj.minX!==undefined?obj.minX:obj.x-100}" onchange="MB._sp('minX',+this.value)"/></div>
+<div class="mb-prop-row"><label>Max X</label><input type="number" class="mb-prop-input" value="${obj.maxX!==undefined?obj.maxX:obj.x+100}" onchange="MB._sp('maxX',+this.value)"/></div>`;
+                if (obj.vy) h+=`<div class="mb-prop-row"><label>Min Y</label><input type="number" class="mb-prop-input" value="${obj.minY!==undefined?obj.minY:obj.y-100}" onchange="MB._sp('minY',+this.value)"/></div>
+<div class="mb-prop-row"><label>Max Y</label><input type="number" class="mb-prop-input" value="${obj.maxY!==undefined?obj.maxY:obj.y+100}" onchange="MB._sp('maxY',+this.value)"/></div>`;
+            }
+            h+=`</div>`;
+        }
+
+        if (!isPlat && (obj.type==='wind'||obj.type==='geyser')) {
+            h+=`<div class="mb-prop-group"><div class="mb-prop-section">${obj.type==='wind'?'Wind Force':'Geyser Force'}</div>
+<div class="mb-prop-row"><label>Force X</label><input type="number" step="0.05" class="mb-prop-input" value="${+(obj.vx||0).toFixed(3)}" onchange="MB._sp('vx',+this.value)"/></div>
+<div class="mb-prop-row"><label>Force Y</label><input type="number" step="0.05" class="mb-prop-input" value="${+(obj.vy||0).toFixed(3)}" onchange="MB._sp('vy',+this.value)"/></div>
+</div>`;
+        }
+
+        h+=`<div class="mb-prop-actions">
+<button class="mb-prop-btn duplicate" onclick="MB.duplicateSelected()">⧉ Dup</button>
+<button class="mb-prop-btn delete" onclick="MB.deleteSelected()">✕ Del</button>
+</div>`;
+        panel.innerHTML=h;
+    },
+
+    _sp(key,val) { // set property
+        const obj=this.getSelObj(); if(obj) obj[key]=val;
+    },
+
+    _toggleMoving(on) {
+        const obj=this.getSelObj(); if(!obj) return;
+        if (on) { obj.vx=1.0; obj.vy=0; obj.minX=obj.x-100; obj.maxX=obj.x+100; }
+        else { ['vx','vy','minX','maxX','minY','maxY'].forEach(k=>delete obj[k]); }
+        this.renderProps();
+    },
+
+    _hex(c) {
+        if (!c||typeof c!=='string') return '#888888';
+        if (c.startsWith('#')) return c.length===7?c:c+'000'.slice(0,7-c.length);
+        // rgba/rgb → best effort guess
+        const m=c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if(m) return '#'+[m[1],m[2],m[3]].map(v=>parseInt(v).toString(16).padStart(2,'0')).join('');
+        return '#888888';
+    },
+
+    // ── Open / Close ──────────────────────────────────────────
+    open(mapId) {
+        this._fromLocal=false;
+        if (mapId) { this.loadMap(mapId); } else { this.newMap(); }
+        this._show();
+    },
+
+    _openFromStage(mapId) {
+        this._fromLocal=true;
+        this.loadMap(mapId);
+        this._show();
+    },
+
+    _show() {
+        hideAllScreens();
+        document.getElementById('screen-mapbuilder').classList.remove('hidden');
+
+        this.canvas=document.getElementById('mb-canvas');
+        this.ctx=this.canvas.getContext('2d');
+        this._resizeCanvas();
+        this.fitCamera();
+        this.snapEnabled=true;
+
+        // Populate top-bar
+        document.getElementById('mb-map-name').value  = this.map.name||'';
+        document.getElementById('mb-map-desc').value  = this.map.desc||'';
+        document.getElementById('mb-map-size').value  = this.map.size||'Medium';
+        document.getElementById('mb-map-bg').value    = this._hex(this.map.bg||'#1a1a2e');
+        document.getElementById('mb-map-friction').value=(this.map.friction||0.82).toString();
+        document.getElementById('mb-friction-val').textContent=(+(this.map.friction||0.82)).toFixed(2);
+        // Emoji dropdown — set closest match
+        const emojiSel=document.getElementById('mb-map-emoji');
+        if(emojiSel){
+            for(let i=0;i<emojiSel.options.length;i++){
+                if(emojiSel.options[i].value===this.map.emoji){ emojiSel.selectedIndex=i; break; }
+            }
+        }
+        const snapBtn=document.getElementById('mb-snap-btn');
+        if(snapBtn){ snapBtn.classList.add('on'); snapBtn.textContent='⊞ Snap'; }
+
+        this.setTool('select');
+        this.renderProps();
+        if(this.animFrame) cancelAnimationFrame(this.animFrame);
+        this.startRenderLoop();
+        this._bindEvents();
+    },
+
+    close() {
+        if(this.animFrame){ cancelAnimationFrame(this.animFrame); this.animFrame=null; }
+        this._unbindEvents();
+        document.getElementById('screen-mapbuilder').classList.add('hidden');
+        hideAllScreens();
+        if (this._fromLocal) {
+            document.getElementById('screen-local').classList.remove('hidden');
+            localSetStep(1); // go back to stage selection step
+        } else {
+            document.getElementById('screen-menu').classList.remove('hidden');
+        }
+    },
+
+    addToGame() {
+        this.saveToGame();
+        _lpRenderMaps();
+        _mbShowToast('✓ Map saved to game!');
+    },
+
+    download() {
+        this.map.name=document.getElementById('mb-map-name').value.trim()||'My Map';
+        this.map.desc=document.getElementById('mb-map-desc').value.trim();
+        this.map.emoji=document.getElementById('mb-map-emoji').value||'🗺️';
+        const json=JSON.stringify(this.map, null, 2);
+        const blob=new Blob([json],{type:'application/json'});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');
+        a.href=url; a.download=(this.map.name).replace(/[^a-z0-9_\- ]/gi,'_').trim().replace(/\s+/g,'_').toLowerCase()+'.json';
+        a.click(); URL.revokeObjectURL(url);
+        _mbShowToast('⬇ Map downloaded!');
+    },
+
+    updateMapSetting(key,val) {
+        if(!this.map) return;
+        this.map[key]=val;
+        if(key==='size') this.fitCamera();
+    },
+
+    // ── Internal ──────────────────────────────────────────────
+    _resizeCanvas() {
+        const wrap=document.getElementById('mb-canvas-wrap');
+        if(!wrap||!this.canvas) return;
+        this.canvas.width=wrap.clientWidth;
+        this.canvas.height=wrap.clientHeight;
+    },
+
+    _bindEvents() {
+        this._evMD=this.onMouseDown.bind(this);
+        this._evMM=this.onMouseMove.bind(this);
+        this._evMU=this.onMouseUp.bind(this);
+        this._evWH=this.onWheel.bind(this);
+        this._evKD=this.onKeyDown.bind(this);
+        this._evRS=()=>{ this._resizeCanvas(); };
+        this.canvas.addEventListener('mousedown',this._evMD);
+        this.canvas.addEventListener('mousemove',this._evMM);
+        window.addEventListener('mouseup',this._evMU);
+        this.canvas.addEventListener('wheel',this._evWH,{passive:false});
+        window.addEventListener('resize',this._evRS);
+        window.addEventListener('keydown',this._evKD);
+        // Prevent context menu on right-click
+        this._evCM=(e)=>e.preventDefault();
+        this.canvas.addEventListener('contextmenu',this._evCM);
+    },
+
+    _unbindEvents() {
+        if(!this.canvas) return;
+        this.canvas.removeEventListener('mousedown',this._evMD);
+        this.canvas.removeEventListener('mousemove',this._evMM);
+        window.removeEventListener('mouseup',this._evMU);
+        this.canvas.removeEventListener('wheel',this._evWH);
+        window.removeEventListener('resize',this._evRS);
+        window.removeEventListener('keydown',this._evKD);
+        this.canvas.removeEventListener('contextmenu',this._evCM);
+    }
+};
+
+// ── Custom map helpers ─────────────────────────────────────────
+function _mbSyncCustomMaps() {
+    // Trim MAPS back to built-ins, then re-add custom maps
+    MAPS.splice(_MB_BUILTIN_MAP_COUNT);
+    const customs = MB.getCustomMaps();
+    customs.forEach(m=>MAPS.push(m));
+}
+
+function _mbShowToast(msg) {
+    let t=document.getElementById('mb-toast');
+    if(!t){ t=document.createElement('div'); t.id='mb-toast'; t.className='mb-toast'; document.body.appendChild(t); }
+    t.textContent=msg; t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+function mbUploadMap() {
+    const inp=document.createElement('input');
+    inp.type='file'; inp.accept='.json,application/json';
+    inp.onchange=e=>{
+        const file=e.target.files[0]; if(!file) return;
+        const reader=new FileReader();
+        reader.onload=ev=>{
+            try {
+                const data=JSON.parse(ev.target.result);
+                if(!data.name||!Array.isArray(data.platforms)){ alert('Invalid map file.'); return; }
+                if(!data._id) data._id='custom_'+Date.now();
+                data._custom=true;
+                if(!data.emoji) data.emoji='🗺️';
+                if(!data.hazards) data.hazards=[];
+                const maps=MB.getCustomMaps();
+                const idx=maps.findIndex(m=>m._id===data._id);
+                if(idx>=0) maps[idx]=data; else maps.push(data);
+                localStorage.setItem('sas_custom_maps',JSON.stringify(maps));
+                _mbSyncCustomMaps();
+                _lpRenderMaps();
+                _mbShowToast('✓ Map imported: '+data.name);
+            } catch(err){ alert('Failed to load map: '+err.message); }
+        };
+        reader.readAsText(file);
+    };
+    inp.click();
+}
+
+// Load custom maps into MAPS on game start
+(function(){ _mbSyncCustomMaps(); })();
 
 // Load saved state from cloud once (runs after game script so _applyCloudState exists)
 if (window._applyCloudState) {
