@@ -13084,10 +13084,10 @@ class Player {
 
     handleCollisions(map,isXAxis){
         for(let haz of map.hazards||[]){
-            if(haz.type==='lava'){if(this.y+this.height>haz.y&&this.x+this.width>haz.x&&this.x<haz.x+haz.w){this.vy=-42;applyDamage(this,5,0,0,'up');spawnParticles(this.x+20,haz.y,'#f97316',20);screenFlash=0.2;}}
+            if(haz.type==='lava'){if(this.y+this.height>haz.y&&this.x+this.width>haz.x&&this.x<haz.x+haz.w){this.vy=-(haz.launchVy??42);applyDamage(this,haz.damage??5,0,0,'up');spawnParticles(this.x+20,haz.y,'#f97316',20);screenFlash=0.2;}}
             else if(haz.type==='wind'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>haz.y&&this.y<haz.y+haz.h){this.vx+=haz.vx||0;this.vy+=haz.vy||0;}}
-            else if(haz.type==='bumper'){let cx=haz.x+haz.w/2,cy=haz.y+haz.h/2;let px=this.x+this.width/2,py=this.y+this.height/2;let dist=Math.hypot(px-cx,py-cy);if(dist<haz.w/2+this.width/2&&this.bumperCooldown<=0){this.vx=((px-cx)/dist)*48;this.vy=((py-cy)/dist)*48;applyDamage(this,2,0,0,'none');spawnParticles(cx,cy,haz.color,20);triggerHitStun(3);this.bumperCooldown=20;}}
-            else if(haz.type==='geyser'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>haz.y&&this.y<haz.y+haz.h){this.vy=Math.min(this.vy,-44);if(gfx.particles&&Math.random()<0.3)spawnParticles(this.x+this.width/2,this.y+this.height,'#7dd3fc',3);}}
+            else if(haz.type==='bumper'){let cx=haz.x+haz.w/2,cy=haz.y+haz.h/2;let px=this.x+this.width/2,py=this.y+this.height/2;let dist=Math.hypot(px-cx,py-cy);let bKb=haz.knockback??48;if(dist<haz.w/2+this.width/2&&this.bumperCooldown<=0){this.vx=((px-cx)/dist)*bKb;this.vy=((py-cy)/dist)*bKb;applyDamage(this,haz.damage??2,0,0,'none');spawnParticles(cx,cy,haz.color,20);triggerHitStun(3);this.bumperCooldown=20;}}
+            else if(haz.type==='geyser'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>haz.y&&this.y<haz.y+haz.h){this.vy=Math.min(this.vy,-(haz.launchVy??44));if(haz.damage&&Math.random()<0.02)applyDamage(this,haz.damage,0,0,'up');if(gfx.particles&&Math.random()<0.3)spawnParticles(this.x+this.width/2,this.y+this.height,'#7dd3fc',3);}}
         }
         for(let plat of map.platforms){
             let isPT=plat.h<=20;
@@ -16029,7 +16029,8 @@ const MB = {
     // ── Config ────────────────────────────────────────────────
     SIZES: { Small:{w:900,h:720}, Medium:{w:1200,h:800}, Large:{w:1600,h:1000}, Massive:{w:2500,h:1800} },
     GRID: 10,
-    HANDLE_PX: 7,      // handle size in screen pixels
+    HANDLE_PX: 9,      // handle size in screen pixels (canvas-pixel space)
+    HANDLE_HIT: 14,    // hit-test radius in canvas-pixel space (generous)
 
     // ── State ─────────────────────────────────────────────────
     map: null,         // current map data being edited
@@ -16147,6 +16148,17 @@ const MB = {
         return Math.round(v / this.GRID) * this.GRID;
     },
 
+    // Convert a raw mouse event position (CSS pixels relative to canvas rect)
+    // into canvas-internal pixel coordinates, accounting for any CSS vs attr mismatch.
+    _cssToCanvas(sx, sy) {
+        const c = this.canvas;
+        const r = c.getBoundingClientRect();
+        const scaleX = r.width  > 0 ? c.width  / r.width  : 1;
+        const scaleY = r.height > 0 ? c.height / r.height : 1;
+        return { x: sx * scaleX, y: sy * scaleY };
+    },
+
+    // All coord math is in canvas-pixel space (c.width × c.height).
     worldToScreen(wx, wy) {
         const c = this.canvas;
         return {
@@ -16155,12 +16167,18 @@ const MB = {
         };
     },
 
-    screenToWorld(sx, sy) {
+    screenToWorld(cx, cy) {  // cx,cy in canvas-pixel space
         const c = this.canvas;
         return {
-            x: (sx - c.width  / 2) / this.cam.zoom + this.cam.x,
-            y: (sy - c.height / 2) / this.cam.zoom + this.cam.y
+            x: (cx - c.width  / 2) / this.cam.zoom + this.cam.x,
+            y: (cy - c.height / 2) / this.cam.zoom + this.cam.y
         };
+    },
+
+    // Helper: get canvas-pixel coords from a mouse event
+    _evPos(e) {
+        const r = this.canvas.getBoundingClientRect();
+        return this._cssToCanvas(e.clientX - r.left, e.clientY - r.top);
     },
 
     fitCamera() {
@@ -16194,20 +16212,22 @@ const MB = {
         return arr[this.sel.idx] || null;
     },
 
-    getHandleAt(obj, sx, sy) {
-        const hs = this.HANDLE_PX + 3;
+    getHandleAt(obj, cx, cy) {  // cx,cy in canvas-pixel space
+        const hs = this.HANDLE_HIT;
         const pts = {
-            nw: this.worldToScreen(obj.x,       obj.y),
-            n:  this.worldToScreen(obj.x+obj.w/2, obj.y),
-            ne: this.worldToScreen(obj.x+obj.w,  obj.y),
-            e:  this.worldToScreen(obj.x+obj.w,  obj.y+obj.h/2),
-            se: this.worldToScreen(obj.x+obj.w,  obj.y+obj.h),
-            s:  this.worldToScreen(obj.x+obj.w/2, obj.y+obj.h),
-            sw: this.worldToScreen(obj.x,         obj.y+obj.h),
-            w:  this.worldToScreen(obj.x,         obj.y+obj.h/2)
+            nw: this.worldToScreen(obj.x,           obj.y),
+            n:  this.worldToScreen(obj.x+obj.w/2,   obj.y),
+            ne: this.worldToScreen(obj.x+obj.w,     obj.y),
+            e:  this.worldToScreen(obj.x+obj.w,     obj.y+obj.h/2),
+            se: this.worldToScreen(obj.x+obj.w,     obj.y+obj.h),
+            s:  this.worldToScreen(obj.x+obj.w/2,   obj.y+obj.h),
+            sw: this.worldToScreen(obj.x,            obj.y+obj.h),
+            w:  this.worldToScreen(obj.x,            obj.y+obj.h/2)
         };
-        for (const [name,pt] of Object.entries(pts)) {
-            if (Math.abs(sx-pt.x)<=hs && Math.abs(sy-pt.y)<=hs) return name;
+        // Check corners first (higher priority), then edges
+        for (const name of ['nw','ne','se','sw','n','s','e','w']) {
+            const pt = pts[name];
+            if (Math.abs(cx-pt.x)<=hs && Math.abs(cy-pt.y)<=hs) return name;
         }
         return null;
     },
@@ -16339,27 +16359,35 @@ const MB = {
         ctx.textAlign='center'; ctx.textBaseline='middle';
         ctx.fillText(labels[h.type]||'?',h.x+h.w/2,h.y+h.h/2);
         ctx.textBaseline='alphabetic';
-        if (isSel && h.type!=='bumper') this._drawHandles(h.x,h.y,h.w,h.h);
+        if (isSel) this._drawHandles(h.x,h.y,h.w,h.h);
     },
 
     _drawHandles(x,y,w,h) {
         const ctx=this.ctx, z=this.cam.zoom;
         const s=this.HANDLE_PX/z;
+        const r=s*0.35; // corner rounding
         const pts=[[x,y],[x+w/2,y],[x+w,y],[x+w,y+h/2],[x+w,y+h],[x+w/2,y+h],[x,y+h],[x,y+h/2]];
-        ctx.fillStyle='#fff'; ctx.strokeStyle='#6366f1'; ctx.lineWidth=1/z;
-        pts.forEach(([hx,hy])=>{ ctx.fillRect(hx-s/2,hy-s/2,s,s); ctx.strokeRect(hx-s/2,hy-s/2,s,s); });
+        pts.forEach(([hx,hy])=>{
+            // Shadow
+            ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=4/z;
+            ctx.fillStyle='#fff';
+            ctx.strokeStyle='#6366f1'; ctx.lineWidth=1.5/z;
+            ctx.beginPath();
+            ctx.roundRect(hx-s/2,hy-s/2,s,s,r);
+            ctx.fill(); ctx.stroke();
+            ctx.shadowBlur=0;
+        });
     },
 
     // ── Mouse events ──────────────────────────────────────────
     onMouseDown(e) {
-        const rect=this.canvas.getBoundingClientRect();
-        const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
-        const wp=this.screenToWorld(sx,sy);
-        const wx=this.snap(wp.x), wy=this.snap(wp.y);
+        const {x:cx,y:cy} = this._evPos(e);  // canvas-pixel space
+        const wp = this.screenToWorld(cx,cy);
+        const wx = this.snap(wp.x), wy = this.snap(wp.y);
 
-        if (e.button===1) { // middle mouse = pan
+        if (e.button===1) {
             this.isPanning=true;
-            this.panStart={mx:sx,my:sy,cx:this.cam.x,cy:this.cam.y};
+            this.panStart={mx:cx,my:cy,cx:this.cam.x,cy:this.cam.y};
             e.preventDefault(); return;
         }
         if (e.button!==0) return;
@@ -16367,10 +16395,10 @@ const MB = {
         if (this.tool==='select') {
             const obj=this.getSelObj();
             if (obj) {
-                const handle=this.getHandleAt(obj,sx,sy);
+                const handle=this.getHandleAt(obj,cx,cy);
                 if (handle) {
                     this.isResizing=true; this.resizeHandle=handle;
-                    this.resizeStart={mx:sx,my:sy,ox:obj.x,oy:obj.y,ow:obj.w,oh:obj.h};
+                    this.resizeStart={mx:cx,my:cy,ox:obj.x,oy:obj.y,ow:obj.w,oh:obj.h};
                     return;
                 }
             }
@@ -16379,12 +16407,12 @@ const MB = {
                 this.sel=hit;
                 const o=this.getSelObj();
                 this.isDragging=true;
-                this.dragStart={mx:sx,my:sy,ox:o.x,oy:o.y};
+                this.dragStart={mx:cx,my:cy,ox:o.x,oy:o.y};
                 this.renderProps();
             } else {
                 this.sel=null; this.renderProps();
                 this.isPanning=true;
-                this.panStart={mx:sx,my:sy,cx:this.cam.x,cy:this.cam.y};
+                this.panStart={mx:cx,my:cy,cx:this.cam.x,cy:this.cam.y};
             }
         } else {
             this.isDrawing=true;
@@ -16394,60 +16422,57 @@ const MB = {
     },
 
     onMouseMove(e) {
-        const rect=this.canvas.getBoundingClientRect();
-        const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
+        const {x:cx,y:cy} = this._evPos(e);  // canvas-pixel space
 
         // Update coords display
-        const wp0=this.screenToWorld(sx,sy);
-        const coordEl=document.getElementById('mb-coords');
-        if(coordEl) coordEl.textContent=`x:${Math.round(wp0.x)}  y:${Math.round(wp0.y)}`;
+        const wp0 = this.screenToWorld(cx,cy);
+        const coordEl = document.getElementById('mb-coords');
+        if (coordEl) coordEl.textContent=`x:${Math.round(wp0.x)}  y:${Math.round(wp0.y)}`;
 
         if (this.isPanning) {
-            const dx=(sx-this.panStart.mx)/this.cam.zoom;
-            const dy=(sy-this.panStart.my)/this.cam.zoom;
+            const dx=(cx-this.panStart.mx)/this.cam.zoom;
+            const dy=(cy-this.panStart.my)/this.cam.zoom;
             this.cam.x=this.panStart.cx-dx;
             this.cam.y=this.panStart.cy-dy;
             return;
         }
 
-        const wp=this.screenToWorld(sx,sy);
-        const wx=this.snap(wp.x), wy=this.snap(wp.y);
+        const wp = this.screenToWorld(cx,cy);
+        const wx = this.snap(wp.x), wy = this.snap(wp.y);
 
         if (this.isDragging && this.sel) {
             const obj=this.getSelObj();
             if (obj) {
-                obj.x=this.snap(this.dragStart.ox+(sx-this.dragStart.mx)/this.cam.zoom);
-                obj.y=this.snap(this.dragStart.oy+(sy-this.dragStart.my)/this.cam.zoom);
+                obj.x=this.snap(this.dragStart.ox+(cx-this.dragStart.mx)/this.cam.zoom);
+                obj.y=this.snap(this.dragStart.oy+(cy-this.dragStart.my)/this.cam.zoom);
                 this.renderProps();
             }
         } else if (this.isResizing && this.sel) {
             const obj=this.getSelObj();
             if (obj) {
-                const dxW=(sx-this.resizeStart.mx)/this.cam.zoom;
-                const dyW=(sy-this.resizeStart.my)/this.cam.zoom;
-                const h=this.resizeHandle;
+                const dxW=(cx-this.resizeStart.mx)/this.cam.zoom;
+                const dyW=(cy-this.resizeStart.my)/this.cam.zoom;
+                const hh=this.resizeHandle;
                 let nx=this.resizeStart.ox,ny=this.resizeStart.oy,nw=this.resizeStart.ow,nh=this.resizeStart.oh;
-                if(h.includes('e')) nw=Math.max(10,this.snap(this.resizeStart.ow+dxW));
-                if(h.includes('s')) nh=Math.max(10,this.snap(this.resizeStart.oh+dyW));
-                if(h.includes('w')){ const nw2=Math.max(10,this.snap(this.resizeStart.ow-dxW)); nx=this.resizeStart.ox+(this.resizeStart.ow-nw2); nw=nw2; }
-                if(h.includes('n')){ const nh2=Math.max(10,this.snap(this.resizeStart.oh-dyW)); ny=this.resizeStart.oy+(this.resizeStart.oh-nh2); nh=nh2; }
+                if(hh.includes('e')) nw=Math.max(10,this.snap(this.resizeStart.ow+dxW));
+                if(hh.includes('s')) nh=Math.max(10,this.snap(this.resizeStart.oh+dyW));
+                if(hh.includes('w')){ const nw2=Math.max(10,this.snap(this.resizeStart.ow-dxW)); nx=this.resizeStart.ox+(this.resizeStart.ow-nw2); nw=nw2; }
+                if(hh.includes('n')){ const nh2=Math.max(10,this.snap(this.resizeStart.oh-dyW)); ny=this.resizeStart.oy+(this.resizeStart.oh-nh2); nh=nh2; }
                 obj.x=nx;obj.y=ny;obj.w=nw;obj.h=nh;
                 this.renderProps();
             }
         } else if (this.isDrawing) {
             this.drawCur={x:wx,y:wy};
         } else if (this.tool==='select') {
-            // Update cursor
             const selObj=this.getSelObj();
             let cur='default';
             if (selObj) {
-                const handle=this.getHandleAt(selObj,sx,sy);
+                const handle=this.getHandleAt(selObj,cx,cy);
                 if (handle) {
                     const cMap={nw:'nw-resize',n:'n-resize',ne:'ne-resize',e:'e-resize',se:'se-resize',s:'s-resize',sw:'sw-resize',w:'w-resize'};
                     cur=cMap[handle]||'default';
                 } else {
-                    const hit=this.hitTest(wp.x,wp.y);
-                    cur=hit?'move':'default';
+                    cur=this.hitTest(wp.x,wp.y)?'move':'default';
                 }
             } else {
                 cur=this.hitTest(wp.x,wp.y)?'move':'default';
@@ -16458,7 +16483,6 @@ const MB = {
 
     onMouseUp(e) {
         if (this.isPanning) { this.isPanning=false; return; }
-
         if (this.isDrawing) {
             this.isDrawing=false;
             const x=Math.min(this.drawStart.x,this.drawCur.x);
@@ -16474,11 +16498,10 @@ const MB = {
     onWheel(e) {
         e.preventDefault();
         const factor=e.deltaY>0?0.88:1.14;
-        const rect=this.canvas.getBoundingClientRect();
-        const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
-        const wp=this.screenToWorld(sx,sy);
+        const {x:cx,y:cy}=this._evPos(e);
+        const wp=this.screenToWorld(cx,cy);
         this.cam.zoom=Math.max(0.08,Math.min(5,this.cam.zoom*factor));
-        const wp2=this.screenToWorld(sx,sy);
+        const wp2=this.screenToWorld(cx,cy);
         this.cam.x+=wp.x-wp2.x;
         this.cam.y+=wp.y-wp2.y;
     },
@@ -16584,11 +16607,31 @@ const MB = {
             h+=`</div>`;
         }
 
-        if (!isPlat && (obj.type==='wind'||obj.type==='geyser')) {
-            h+=`<div class="mb-prop-group"><div class="mb-prop-section">${obj.type==='wind'?'Wind Force':'Geyser Force'}</div>
+        if (!isPlat) {
+            if (obj.type==='wind') {
+                h+=`<div class="mb-prop-group"><div class="mb-prop-section">Wind Force</div>
 <div class="mb-prop-row"><label>Force X</label><input type="number" step="0.05" class="mb-prop-input" value="${+(obj.vx||0).toFixed(3)}" onchange="MB._sp('vx',+this.value)"/></div>
 <div class="mb-prop-row"><label>Force Y</label><input type="number" step="0.05" class="mb-prop-input" value="${+(obj.vy||0).toFixed(3)}" onchange="MB._sp('vy',+this.value)"/></div>
 </div>`;
+            }
+            if (obj.type==='lava') {
+                h+=`<div class="mb-prop-group"><div class="mb-prop-section">Lava Properties</div>
+<div class="mb-prop-row"><label>Damage</label><input type="number" min="0" max="999" class="mb-prop-input" value="${obj.damage??5}" onchange="MB._sp('damage',+this.value)"/></div>
+<div class="mb-prop-row"><label>Launch Vy</label><input type="number" min="0" max="200" class="mb-prop-input" value="${obj.launchVy??42}" title="Upward launch speed on contact" onchange="MB._sp('launchVy',+this.value)"/></div>
+</div>`;
+            }
+            if (obj.type==='bumper') {
+                h+=`<div class="mb-prop-group"><div class="mb-prop-section">Bumper Properties</div>
+<div class="mb-prop-row"><label>Damage</label><input type="number" min="0" max="999" class="mb-prop-input" value="${obj.damage??2}" onchange="MB._sp('damage',+this.value)"/></div>
+<div class="mb-prop-row"><label>Knockback</label><input type="number" min="0" max="200" class="mb-prop-input" value="${obj.knockback??48}" title="Launch force on contact" onchange="MB._sp('knockback',+this.value)"/></div>
+</div>`;
+            }
+            if (obj.type==='geyser') {
+                h+=`<div class="mb-prop-group"><div class="mb-prop-section">Geyser Properties</div>
+<div class="mb-prop-row"><label>Launch Vy</label><input type="number" min="0" max="200" class="mb-prop-input" value="${obj.launchVy??44}" title="Upward push speed" onchange="MB._sp('launchVy',+this.value)"/></div>
+<div class="mb-prop-row"><label>Damage</label><input type="number" min="0" max="999" class="mb-prop-input" value="${obj.damage??0}" title="Damage per tick (0 = none)" onchange="MB._sp('damage',+this.value)"/></div>
+</div>`;
+            }
         }
 
         h+=`<div class="mb-prop-actions">
@@ -16637,8 +16680,11 @@ const MB = {
 
         this.canvas=document.getElementById('mb-canvas');
         this.ctx=this.canvas.getContext('2d');
-        this._resizeCanvas();
-        this.fitCamera();
+        // Defer resize+fit one frame so the flex layout has settled
+        requestAnimationFrame(()=>{
+            this._resizeCanvas();
+            this.fitCamera();
+        });
         this.snapEnabled=true;
 
         // Populate top-bar
@@ -16717,7 +16763,7 @@ const MB = {
         this._evMU=this.onMouseUp.bind(this);
         this._evWH=this.onWheel.bind(this);
         this._evKD=this.onKeyDown.bind(this);
-        this._evRS=()=>{ this._resizeCanvas(); };
+        this._evRS=()=>{ this._resizeCanvas(); this.fitCamera(); };
         this.canvas.addEventListener('mousedown',this._evMD);
         this.canvas.addEventListener('mousemove',this._evMM);
         window.addEventListener('mouseup',this._evMU);
