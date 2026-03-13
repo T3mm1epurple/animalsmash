@@ -3574,7 +3574,6 @@
         <!-- Top bar -->
         <div id="mb-topbar">
             <button id="mb-back-btn" onclick="MB.close()">← Back</button>
-            <button class="mb-action-btn mb-action-playtest" onclick="MB.playtest()" title="Play test this map (Esc to exit)">▶ Playtest</button>
 
             <input class="mb-title-input" id="mb-map-name" placeholder="Map Name" maxlength="32"
                 oninput="MB.map.name=this.value" />
@@ -3620,6 +3619,7 @@
                 title="Toggle grid snap (G)">⊞ Snap</button>
 
             <div class="mb-topbar-actions">
+                <button class="mb-action-btn mb-action-playtest" onclick="MB.playtest()" title="Play test this map (Esc to exit)">▶ Playtest</button>
                 <button class="mb-action-btn download" onclick="MB.download()">⬇ Download</button>
                 <button class="mb-action-btn save" onclick="MB.addToGame()">✦ Save to Game</button>
             </div>
