@@ -2686,6 +2686,132 @@
         }
         .mb-snap-btn.on { background:rgba(99,102,241,0.15); border-color:rgba(99,102,241,0.4); color:#a5b4fc; }
 
+        /* ─── Map Manager Modal ───────────────────────────────── */
+        #mb-manager-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200;
+            display:flex; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity 0.22s;
+        }
+        #mb-manager-overlay.open { opacity:1; pointer-events:all; }
+        #mb-manager-box {
+            background:#0d1022; border:1px solid rgba(139,92,246,0.25);
+            border-radius:20px; box-shadow:0 24px 80px rgba(0,0,0,0.7);
+            padding:28px 32px; width:min(700px,92vw); max-height:88vh;
+            display:flex; flex-direction:column; gap:18px; overflow:hidden;
+        }
+        #mb-manager-header {
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        #mb-manager-title {
+            font-family:'Poppins',sans-serif; font-size:18px; font-weight:900;
+            color:#f1f5f9; letter-spacing:-0.3px;
+        }
+        #mb-manager-close {
+            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+            color:#64748b; font-size:16px; width:32px; height:32px; border-radius:8px;
+            cursor:pointer; transition:all 0.18s; display:flex; align-items:center; justify-content:center;
+        }
+        #mb-manager-close:hover { background:rgba(255,255,255,0.12); color:#e2e8f0; }
+        #mb-manager-grid {
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+            gap:14px; overflow-y:auto; padding-right:4px;
+        }
+        #mb-manager-grid::-webkit-scrollbar { width:4px; }
+        #mb-manager-grid::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+        .mbm-card {
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);
+            border-radius:14px; padding:16px 14px; cursor:pointer;
+            transition:all 0.18s; display:flex; flex-direction:column; gap:6px;
+            position:relative; overflow:hidden;
+        }
+        .mbm-card:hover { border-color:rgba(139,92,246,0.4); background:rgba(99,102,241,0.07); transform:translateY(-2px); }
+        .mbm-card.new-card {
+            border-style:dashed; border-color:rgba(99,102,241,0.3);
+            align-items:center; justify-content:center; min-height:110px;
+        }
+        .mbm-card.new-card:hover { border-color:rgba(139,92,246,0.7); background:rgba(99,102,241,0.12); }
+        .mbm-card-emoji { font-size:26px; line-height:1; }
+        .mbm-card-name {
+            font-family:'Poppins',sans-serif; font-size:12px; font-weight:800;
+            color:#f1f5f9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .mbm-card-desc {
+            font-family:'Poppins',sans-serif; font-size:10px; color:#64748b;
+            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+        }
+        .mbm-card-badge {
+            font-size:8px; font-weight:800; color:#a78bfa; text-transform:uppercase; letter-spacing:0.5px;
+        }
+        .mbm-card-actions {
+            display:flex; gap:5px; margin-top:4px;
+        }
+        .mbm-act-btn {
+            flex:1; font-family:'Poppins',sans-serif; font-size:9px; font-weight:800;
+            padding:5px 6px; border-radius:7px; border:none; cursor:pointer;
+            transition:all 0.15s; text-transform:uppercase; letter-spacing:0.4px;
+        }
+        .mbm-act-btn.edit { background:rgba(99,102,241,0.2); color:#818cf8; }
+        .mbm-act-btn.edit:hover { background:rgba(99,102,241,0.35); }
+        .mbm-act-btn.del { background:rgba(239,68,68,0.13); color:#f87171; }
+        .mbm-act-btn.del:hover { background:rgba(239,68,68,0.26); }
+        .mbm-new-icon { font-size:28px; margin-bottom:4px; }
+        .mbm-new-label {
+            font-family:'Poppins',sans-serif; font-size:11px; font-weight:800; color:#818cf8;
+        }
+
+        /* ─── Overwrite Modal ────────────────────────────────── */
+        #mb-overwrite-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:210;
+            display:flex; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity 0.22s;
+        }
+        #mb-overwrite-overlay.open { opacity:1; pointer-events:all; }
+        #mb-overwrite-box {
+            background:#0d1022; border:1px solid rgba(139,92,246,0.25);
+            border-radius:18px; box-shadow:0 20px 70px rgba(0,0,0,0.7);
+            padding:24px 28px; width:min(460px,90vw);
+            display:flex; flex-direction:column; gap:16px;
+        }
+        #mb-overwrite-title {
+            font-family:'Poppins',sans-serif; font-size:15px; font-weight:900; color:#f1f5f9;
+        }
+        #mb-overwrite-desc {
+            font-family:'Poppins',sans-serif; font-size:12px; color:#64748b; margin-top:-8px;
+        }
+        #mb-overwrite-list {
+            display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto;
+        }
+        #mb-overwrite-list::-webkit-scrollbar { width:4px; }
+        #mb-overwrite-list::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+        .mbow-row {
+            display:flex; align-items:center; gap:10px;
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+            border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.16s;
+        }
+        .mbow-row:hover { border-color:rgba(139,92,246,0.4); background:rgba(99,102,241,0.1); }
+        .mbow-row-emoji { font-size:20px; }
+        .mbow-row-info { flex:1; min-width:0; }
+        .mbow-row-name { font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; color:#f1f5f9; }
+        .mbow-row-desc { font-family:'Poppins',sans-serif; font-size:10px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .mbow-row-overwrite { font-family:'Poppins',sans-serif; font-size:9px; font-weight:800; color:#f87171; text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap; }
+        .mbow-divider {
+            font-family:'Poppins',sans-serif; font-size:9px; font-weight:800; color:#334155;
+            text-transform:uppercase; letter-spacing:0.8px; text-align:center;
+        }
+        .mbow-save-new {
+            display:flex; align-items:center; gap:10px;
+            background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25);
+            border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.16s;
+        }
+        .mbow-save-new:hover { background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.5); }
+        .mbow-save-new-icon { font-size:18px; }
+        .mbow-save-new-label { font-family:'Poppins',sans-serif; font-size:12px; font-weight:800; color:#818cf8; }
+        .mbow-cancel {
+            font-family:'Poppins',sans-serif; font-size:11px; font-weight:700; color:#475569;
+            text-align:center; cursor:pointer; padding:6px; transition:color 0.16s;
+        }
+        .mbow-cancel:hover { color:#94a3b8; }
+
     </style>
 <!-- Code injected by Five-server -->
   </head>
@@ -2768,7 +2894,7 @@
                 <div class="menu-online-dot"></div>
             </button>
 
-            <button class="menu-btn menu-btn-mapbuilder" onclick="MB.open(null)">
+            <button class="menu-btn menu-btn-mapbuilder" onclick="MB.openManager()">
                 <div class="menu-btn-inner">
                     <span class="menu-btn-icon">🗺️</span>
                     <div class="menu-btn-text">
@@ -3702,6 +3828,27 @@
 
         </div><!-- /mb-editor -->
     </div><!-- /screen-mapbuilder -->
+
+    <!-- Map Manager Overlay -->
+    <div id="mb-manager-overlay">
+        <div id="mb-manager-box">
+            <div id="mb-manager-header">
+                <div id="mb-manager-title">🗺️ Map Builder</div>
+                <button id="mb-manager-close" onclick="MB.closeManager()">✕</button>
+            </div>
+            <div id="mb-manager-grid"><!-- filled by MB.openManager() --></div>
+        </div>
+    </div>
+
+    <!-- Overwrite Modal -->
+    <div id="mb-overwrite-overlay">
+        <div id="mb-overwrite-box">
+            <div id="mb-overwrite-title">💾 Save Map</div>
+            <div id="mb-overwrite-desc">Save as a new map, or overwrite an existing one.</div>
+            <div id="mb-overwrite-list"><!-- filled by MB.showOverwriteDialog() --></div>
+            <div class="mbow-cancel" onclick="MB.closeOverwriteDialog()">Cancel</div>
+        </div>
+    </div>
 
     <!-- Game Over -->
     <div id="screen-game-over" class="screen hidden" style="flex-direction:column;justify-content:flex-start;align-items:center;gap:0;padding:0;overflow:hidden;">
@@ -16901,6 +17048,53 @@ ${obj.shape==='deco'?`<div class="mb-prop-row"><label>Border</label>
         return '#888888';
     },
 
+    // ── Map Manager ───────────────────────────────────────────
+    openManager() {
+        const overlay = document.getElementById('mb-manager-overlay');
+        const grid    = document.getElementById('mb-manager-grid');
+        if (!overlay||!grid) return;
+        const maps = this.getCustomMaps();
+        let html = '';
+        maps.forEach(m=>{
+            const id   = m._id;
+            const name = (m.name||'Unnamed').replace(/</g,'&lt;');
+            const desc = (m.desc||'').replace(/</g,'&lt;');
+            const emoji= m.emoji||'🗺️';
+            html += `<div class="mbm-card">
+                <div class="mbm-card-emoji">${emoji}</div>
+                <div class="mbm-card-name">${name}</div>
+                ${desc?`<div class="mbm-card-desc">${desc}</div>`:''}
+                <div class="mbm-card-badge">Custom Map</div>
+                <div class="mbm-card-actions">
+                    <button class="mbm-act-btn edit" onclick="MB.closeManager();MB.open('${id}')">✏ Edit</button>
+                    <button class="mbm-act-btn del" onclick="MB._managerDelete('${id}')">✕</button>
+                </div>
+            </div>`;
+        });
+        // "New Map" card always at end
+        html += `<div class="mbm-card new-card" onclick="MB.closeManager();MB.open(null)">
+            <div class="mbm-new-icon">＋</div>
+            <div class="mbm-new-label">New Map</div>
+        </div>`;
+        grid.innerHTML = html;
+        overlay.classList.add('open');
+    },
+
+    closeManager() {
+        document.getElementById('mb-manager-overlay')?.classList.remove('open');
+    },
+
+    _managerDelete(id) {
+        if (!confirm('Delete this custom map permanently?')) return;
+        const maps = this.getCustomMaps().filter(m=>m._id!==id);
+        localStorage.setItem('sas_custom_maps', JSON.stringify(maps));
+        _mbSyncCustomMaps();
+        if (selectedMapIdx >= MAPS.length) selectedMapIdx = 0;
+        _lpRenderMaps();
+        _mbShowToast('Map deleted.');
+        this.openManager(); // refresh
+    },
+
     // ── Open / Close ──────────────────────────────────────────
     open(mapId) {
         this._fromLocal=false;
@@ -16965,9 +17159,86 @@ ${obj.shape==='deco'?`<div class="mb-prop-row"><label>Border</label>
     },
 
     addToGame() {
+        // If editing an existing map, just save it directly (no overwrite needed)
+        if (this.mapId) {
+            this.saveToGame();
+            _lpRenderMaps();
+            _mbShowToast('✓ Map saved!');
+            return;
+        }
+        // New map — offer to save new or overwrite an existing one
+        const existing = this.getCustomMaps();
+        if (existing.length === 0) {
+            this.saveToGame();
+            _lpRenderMaps();
+            _mbShowToast('✓ Map saved to game!');
+            return;
+        }
+        this.showOverwriteDialog();
+    },
+
+    showOverwriteDialog() {
+        const overlay = document.getElementById('mb-overwrite-overlay');
+        const list    = document.getElementById('mb-overwrite-list');
+        if (!overlay||!list) return;
+        const maps = this.getCustomMaps();
+        let html = `<div class="mbow-save-new" onclick="MB._doSaveNew()">
+            <div class="mbow-save-new-icon">✨</div>
+            <div class="mbow-save-new-label">Save as New Map</div>
+        </div>`;
+        if (maps.length > 0) {
+            html += `<div class="mbow-divider">— or overwrite —</div>`;
+            maps.forEach(m=>{
+                const id   = m._id;
+                const name = (m.name||'Unnamed').replace(/</g,'&lt;');
+                const desc = (m.desc||'').replace(/</g,'&lt;');
+                html += `<div class="mbow-row" onclick="MB._doOverwrite('${id}')">
+                    <div class="mbow-row-emoji">${m.emoji||'🗺️'}</div>
+                    <div class="mbow-row-info">
+                        <div class="mbow-row-name">${name}</div>
+                        ${desc?`<div class="mbow-row-desc">${desc}</div>`:''}
+                    </div>
+                    <div class="mbow-row-overwrite">Overwrite</div>
+                </div>`;
+            });
+        }
+        list.innerHTML = html;
+        overlay.classList.add('open');
+    },
+
+    closeOverwriteDialog() {
+        document.getElementById('mb-overwrite-overlay')?.classList.remove('open');
+    },
+
+    _doSaveNew() {
+        this.closeOverwriteDialog();
         this.saveToGame();
         _lpRenderMaps();
         _mbShowToast('✓ Map saved to game!');
+    },
+
+    _doOverwrite(targetId) {
+        if (!confirm('Overwrite that map? This cannot be undone.')) return;
+        this.closeOverwriteDialog();
+        // Sync name/desc from topbar inputs
+        this.map.name  = document.getElementById('mb-map-name').value.trim() || 'My Map';
+        this.map.desc  = document.getElementById('mb-map-desc').value.trim();
+        this.map.emoji = document.getElementById('mb-map-emoji').value || '🗺️';
+        const maps = this.getCustomMaps();
+        const idx  = maps.findIndex(m=>m._id===targetId);
+        if (idx>=0) {
+            // Preserve the target's id so references stay valid
+            const overwritten = JSON.parse(JSON.stringify(this.map));
+            overwritten._id = targetId;
+            maps[idx] = overwritten;
+            localStorage.setItem('sas_custom_maps', JSON.stringify(maps));
+            // Update current editing session to now point to the overwritten map
+            this.map._id = targetId;
+            this.mapId   = targetId;
+            _mbSyncCustomMaps();
+            _lpRenderMaps();
+            _mbShowToast('✓ Map overwritten!');
+        }
     },
 
     download() {
