@@ -2544,6 +2544,11 @@
         .mb-tool:hover { background:rgba(255,255,255,0.09); color:#e2e8f0; border-color:rgba(255,255,255,0.15); }
         .mb-tool.active { background:rgba(99,102,241,0.2); border-color:rgba(99,102,241,0.5); color:#a5b4fc; }
         .mb-tool-icon { display:block; font-size:18px; margin-bottom:2px; }
+        .mb-tool-playtest { background:rgba(34,197,94,0.15)!important; border-color:rgba(34,197,94,0.4)!important; color:#86efac!important; margin-top:4px; }
+        .mb-tool-playtest:hover { background:rgba(34,197,94,0.3)!important; color:#bbf7d0!important; }
+        #mb-playtest-overlay { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:200; pointer-events:all; }
+        #mb-playtest-stop-btn { background:rgba(239,68,68,0.92); border:2px solid rgba(255,100,100,0.6); color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:700; padding:8px 20px; border-radius:10px; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.5); letter-spacing:0.5px; }
+        #mb-playtest-stop-btn:hover { background:rgba(239,68,68,1); box-shadow:0 6px 20px rgba(0,0,0,0.6); transform:scale(1.03); }
         #mb-canvas-wrap {
             flex:1; min-width:0; position:relative; overflow:hidden; cursor:default;
         }
@@ -3675,9 +3680,17 @@
                     <span class="mb-tool-icon">🎨</span>Deco
                 </button>
 
+                <span class="mb-tool-label" style="margin-top:10px;">Spawn</span>
+                <button class="mb-tool" id="mb-tool-spawn" onclick="MB.setTool('spawn')" title="Place a player spawn point">
+                    <span class="mb-tool-icon">🚩</span>Spawn
+                </button>
+
                 <span class="mb-tool-label" style="margin-top:10px;">View</span>
                 <button class="mb-tool" onclick="MB.fitCamera()" title="Fit map to view">
                     <span class="mb-tool-icon">⊡</span>Fit
+                </button>
+                <button class="mb-tool mb-tool-playtest" onclick="MB.playtest()" title="Play test this map as Pigeon (Esc to exit)">
+                    <span class="mb-tool-icon">▶</span>Playtest
                 </button>
             </div>
 
@@ -3771,6 +3784,11 @@
     </div>
 
     <canvas id="gameCanvas" width="1200" height="800" style="position:absolute;top:0;left:0;z-index:1;display:block;"></canvas>
+
+    <!-- Playtest exit button — shown only when playtesting from map editor -->
+    <div id="mb-playtest-overlay">
+        <button id="mb-playtest-stop-btn" onclick="MB.stopPlaytest()">✕ Exit Playtest</button>
+    </div>
 
     <!-- shake-wrapper: after canvas in DOM, overlays it. Shakes independently so #game-container scale stays intact -->
     <div id="shake-wrapper" style="position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden;">
@@ -10536,9 +10554,10 @@ function pauseLeave(){
     }
 }
 
-// Escape key toggles pause during gameplay
+// Escape key toggles pause during gameplay (or exits playtest)
 document.addEventListener('keydown', e => {
     if(e.key === 'Escape'){
+        if(MB._playtesting){ MB.stopPlaytest(); return; }
         if(gameState === 'PLAYING' || gameState === 'PAUSED'){ togglePause(); return; }
         closeChangelog(); closeSettings();
     }
@@ -12376,6 +12395,7 @@ function spawnConfetti(count) {
 }
 
 function triggerGameOver(winners){
+    if(MB._playtesting){ initGame(); return; }
     stopStageMorph();
     // Hide gamemode timer HUD
     const _gmHud=document.getElementById('gamemode-timer-hud'); if(_gmHud) _gmHud.style.display='none';
@@ -13306,8 +13326,17 @@ class Player {
             this.weightMult=(this.charStats.weight||1)*matchRules.globalSize;this.accelMult=1;this.dmgMult=1*matchRules.globalSize;
             this.shieldHP=100;this.lastAttacker=null;
             let map=MAPS[selectedMapIdx];
-            let sp=map.platforms[Math.floor(Math.random()*map.platforms.length)];
-            this.x=sp.x+sp.w/2-20;this.y=sp.y-150;this.jumps=this.maxJumps;
+            const _dieSpawnPts=(map.hazards||[]).filter(h=>h.type==='spawn');
+            if(_dieSpawnPts.length>0){
+                let sp=_dieSpawnPts[Math.floor(Math.random()*_dieSpawnPts.length)];
+                this.x=sp.x+sp.w/2-20;this.y=sp.y-120;
+            } else if(map.platforms.length>0){
+                let sp=map.platforms[Math.floor(Math.random()*map.platforms.length)];
+                this.x=sp.x+sp.w/2-20;this.y=sp.y-150;
+            } else {
+                this.x=100;this.y=100;
+            }
+            this.jumps=this.maxJumps;
         } else {this.x=-9999;this.y=-9999;}
     }
 
@@ -14344,10 +14373,20 @@ function initGame(){
     window._hpHolder=null; window._hpTimer=480;
     window._swapTimer=1200;
     let map=MAPS[selectedMapIdx];
+    const _spawnPts=(map.hazards||[]).filter(h=>h.type==='spawn');
     slots.forEach((s,idx)=>{
-        let sp=map.platforms[idx%map.platforms.length];
-        let spX=sp.x+(sp.w/2)-20+(Math.random()*40-20);
-        let spY=sp.y-150-(Math.random()*50);
+        let spX,spY;
+        if(_spawnPts.length>0){
+            let sp=_spawnPts[idx%_spawnPts.length];
+            spX=sp.x+sp.w/2+(Math.random()*40-20);
+            spY=sp.y-120-(Math.random()*40);
+        } else if(map.platforms.length>0){
+            let sp=map.platforms[idx%map.platforms.length];
+            spX=sp.x+(sp.w/2)-20+(Math.random()*40-20);
+            spY=sp.y-150-(Math.random()*50);
+        } else {
+            spX=100+(idx*120); spY=100;
+        }
         let p=new Player(spX,spY,s);
         p.width=40*matchRules.globalSize;p.height=40*matchRules.globalSize;
         p.weightMult=(s.charStats&&s.charStats.weight?s.charStats.weight:1)*matchRules.globalSize;
@@ -15063,6 +15102,7 @@ function drawGameWorld(map){
     }else if(haz.type==='freeze'){const g=ctx.createLinearGradient(haz.x,haz.y,haz.x+haz.w,haz.y+haz.h);g.addColorStop(0,'rgba(147,197,253,0.4)');g.addColorStop(1,'rgba(186,230,253,0.2)');ctx.fillStyle=g;ctx.fillRect(haz.x,haz.y,haz.w,haz.h);ctx.strokeStyle='rgba(147,197,253,0.5)';ctx.lineWidth=1;for(let y=haz.y;y<haz.y+haz.h;y+=16){ctx.beginPath();ctx.moveTo(haz.x,y);ctx.lineTo(haz.x+haz.w,y);ctx.stroke();}ctx.fillStyle='rgba(186,230,253,0.8)';ctx.font=`${Math.min(haz.w,haz.h)*0.4}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('❄️',haz.x+haz.w/2,haz.y+haz.h/2);
     }else if(haz.type==='conveyor'){ctx.fillStyle=haz.color||'#78716c';ctx.fillRect(haz.x,haz.y,haz.w,haz.h);const t=Date.now()/300;const dir=haz.vx>0?1:-1;ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font=`bold ${Math.min(haz.h*0.8,16)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';for(let i=0;i<4;i++){const ox=((t*dir+i/4)*haz.w)%haz.w;ctx.fillText(dir>0?'→':'←',haz.x+ox,haz.y+haz.h/2);}
     }else if(haz.type==='deathZone'){ctx.fillStyle=haz.color||'#0a0a0a';ctx.fillRect(haz.x,haz.y,haz.w,haz.h);ctx.strokeStyle='rgba(239,68,68,0.8)';ctx.lineWidth=2;ctx.strokeRect(haz.x,haz.y,haz.w,haz.h);const pulse=0.6+Math.sin(Date.now()/200)*0.4;ctx.globalAlpha=pulse;ctx.fillStyle='rgba(239,68,68,0.15)';ctx.fillRect(haz.x,haz.y,haz.w,haz.h);ctx.globalAlpha=1;ctx.font=`${Math.min(haz.w,haz.h)*0.4}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('💀',haz.x+haz.w/2,haz.y+haz.h/2);
+    }else if(haz.type==='spawn'){/* spawn points are editor-only markers, not rendered in-game */
     }else{ctx.fillRect(haz.x,haz.y,haz.w,haz.h);}}
     for(let plat of map.platforms){
         const sh=plat.shape||'rect';
@@ -16457,7 +16497,7 @@ const MB = {
     _drawHazard(h, idx) {
         const ctx=this.ctx, z=this.cam.zoom;
         const isSel=this.sel&&this.sel.type==='hazard'&&this.sel.idx===idx;
-        const labels={lava:'🌋',bumper:'🎯',wind:'🌪️',geyser:'💦',spike:'🔺',bouncePad:'↑↑',freeze:'❄️',conveyor:'⚙️',deathZone:'💀'};
+        const labels={lava:'🌋',bumper:'🎯',wind:'🌪️',geyser:'💦',spike:'🔺',bouncePad:'↑↑',freeze:'❄️',conveyor:'⚙️',deathZone:'💀',spawn:'🚩'};
 
         ctx.save();
         if (h.type==='bumper') {
@@ -16520,6 +16560,20 @@ const MB = {
             ctx.strokeStyle='rgba(239,68,68,0.9)'; ctx.lineWidth=2/z;
             ctx.strokeRect(h.x,h.y,h.w,h.h);
             ctx.fillStyle='rgba(239,68,68,0.12)'; ctx.fillRect(h.x,h.y,h.w,h.h);
+        } else if (h.type==='spawn') {
+            // Spawn point: green flag marker with dashed border
+            const cx2=h.x+h.w/2, cy2=h.y+h.h/2;
+            ctx.fillStyle='rgba(34,197,94,0.18)';
+            ctx.strokeStyle='rgba(34,197,94,0.7)'; ctx.lineWidth=2/z;
+            ctx.setLineDash([6/z,3/z]);
+            ctx.beginPath(); ctx.roundRect(h.x,h.y,h.w,h.h,4/z); ctx.fill(); ctx.stroke();
+            ctx.setLineDash([]);
+            // Flag pole
+            ctx.strokeStyle='rgba(34,197,94,0.9)'; ctx.lineWidth=2/z;
+            ctx.beginPath(); ctx.moveTo(cx2,h.y+h.h*0.85); ctx.lineTo(cx2,h.y+h.h*0.15); ctx.stroke();
+            // Flag triangle
+            ctx.fillStyle='rgba(34,197,94,0.9)';
+            ctx.beginPath(); ctx.moveTo(cx2,h.y+h.h*0.15); ctx.lineTo(cx2+h.w*0.3,h.y+h.h*0.32); ctx.lineTo(cx2,h.y+h.h*0.48); ctx.closePath(); ctx.fill();
         } else {
             ctx.fillStyle=h.color||'rgba(234,88,12,0.55)'; ctx.fillRect(h.x,h.y,h.w,h.h);
             if (h.type==='geyser') {
@@ -16535,7 +16589,7 @@ const MB = {
 
         // Emoji label
         const lb=labels[h.type];
-        if (lb&&h.type!=='bouncePad'&&h.type!=='conveyor') {
+        if (lb&&h.type!=='bouncePad'&&h.type!=='conveyor'&&h.type!=='spawn') {
             const fs=Math.max(12,Math.min(h.w,h.h)*0.38)/z;
             ctx.font=`${fs}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
             ctx.fillText(lb,h.x+h.w/2,h.y+h.h/2); ctx.textBaseline='alphabetic';
@@ -16726,7 +16780,7 @@ const MB = {
             this.map.platforms.push(obj);
             this.sel={type:'platform',idx:this.map.platforms.length-1};
         } else {
-            const defCol={lava:'#ea580c',bumper:'#d946ef',wind:'rgba(148,163,184,0.07)',geyser:'#0ea5e9',spike:'#dc2626',bouncePad:'#22c55e',freeze:'#93c5fd',conveyor:'#78716c',deathZone:'#0a0a0a'};
+            const defCol={lava:'#ea580c',bumper:'#d946ef',wind:'rgba(148,163,184,0.07)',geyser:'#0ea5e9',spike:'#dc2626',bouncePad:'#22c55e',freeze:'#93c5fd',conveyor:'#78716c',deathZone:'#0a0a0a',spawn:'#22c55e'};
             const obj={x,y,w,h,type,color:defCol[type]||'#ef4444'};
             if (type==='wind')      { obj.vy=-0.7; obj.vx=0; }
             if (type==='geyser')    { obj.vy=-12; }
@@ -16776,7 +16830,7 @@ const MB = {
         const isPlat=this.sel.type==='platform';
         const isMoving=!!(obj.vx||obj.vy);
         const sh=obj.shape||'rect';
-        const typeNames={lava:'🌋 Lava',bumper:'🎯 Bumper',wind:'🌪️ Wind',geyser:'💦 Geyser',spike:'🔺 Spikes',bouncePad:'🟩 Bounce Pad',freeze:'❄️ Freeze',conveyor:'⚙️ Conveyor',deathZone:'💀 Death Zone'};
+        const typeNames={lava:'🌋 Lava',bumper:'🎯 Bumper',wind:'🌪️ Wind',geyser:'💦 Geyser',spike:'🔺 Spikes',bouncePad:'🟩 Bounce Pad',freeze:'❄️ Freeze',conveyor:'⚙️ Conveyor',deathZone:'💀 Death Zone',spawn:'🚩 Spawn Point'};
         const shapeNames={rect:'▬ Platform',rampL:'◺ Ramp /',rampR:'◿ Ramp \\',round:'⬭ Round',deco:'🎨 Deco'};
         let h=`<div class="mb-prop-header">${isPlat?(shapeNames[sh]||'▬ Platform'):(typeNames[obj.type]||obj.type)}</div>`;
 
@@ -16872,6 +16926,10 @@ ${obj.shape==='deco'?`<div class="mb-prop-row"><label>Border</label>
                 h+=`<div class="mb-prop-group"><div class="mb-prop-section">Death Zone Properties</div>
 <div class="mb-prop-row"><label>Damage</label><input type="number" min="0" max="9999" class="mb-prop-input" value="${obj.damage??999}" onchange="MB._sp('damage',+this.value)"/></div></div>`;
             }
+            if (obj.type==='spawn') {
+                h+=`<div class="mb-prop-group"><div class="mb-prop-section">Spawn Point</div>
+<div style="font-size:10px;color:#64748b;padding:4px 2px;line-height:1.5;">Players spawn above this marker. Place multiple spawn points for varied starting positions.<br><br>If none exist, the default platform-based spawn is used.</div></div>`;
+            }
         }
 
         h+=`<div class="mb-prop-actions">
@@ -16899,6 +16957,99 @@ ${obj.shape==='deco'?`<div class="mb-prop-row"><label>Border</label>
         const m=c.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
         if(m) return '#'+[m[1],m[2],m[3]].map(v=>parseInt(v).toString(16).padStart(2,'0')).join('');
         return '#888888';
+    },
+
+    // ── Playtest ──────────────────────────────────────────────
+    _playtesting: false,
+    _ptSavedSlots: null,
+    _ptSavedMatchRules: null,
+    _ptSavedMapIdx: null,
+    _ptSavedOnlineRole: null,
+    _ptTempMapId: null,
+
+    playtest() {
+        if (this._playtesting) return;
+
+        // Sync map name/desc from top-bar inputs before playtesting
+        this.map.name = document.getElementById('mb-map-name').value.trim() || 'My Map';
+        this.map.desc = document.getElementById('mb-map-desc').value.trim();
+        this.map.emoji = document.getElementById('mb-map-emoji').value || '🗺️';
+
+        // Save current game state
+        this._ptSavedSlots = JSON.parse(JSON.stringify(slots));
+        this._ptSavedMatchRules = JSON.parse(JSON.stringify(matchRules));
+        this._ptSavedMapIdx = selectedMapIdx;
+        this._ptSavedOnlineRole = onlineRole;
+
+        // Register this map temporarily (or update if it already exists by _id)
+        const tempMap = JSON.parse(JSON.stringify(this.map));
+        if (!tempMap._id) tempMap._id = '_playtest_tmp_' + Date.now();
+        tempMap._custom = true;
+        let ptIdx = MAPS.findIndex(m => m._id === tempMap._id || m._id === '_playtest_current_');
+        tempMap._id = '_playtest_current_';
+        if (ptIdx >= 0) { MAPS[ptIdx] = tempMap; }
+        else { MAPS.push(tempMap); ptIdx = MAPS.length - 1; }
+        this._ptTempMapId = '_playtest_current_';
+        selectedMapIdx = ptIdx;
+
+        // Set up single pigeon player, no opponents, infinite time
+        onlineRole = null;
+        teamMode = false;
+        slots = [{ id:0, type:'player', char:'🕊️', difficulty:'player', team:0 }];
+        matchRules = {
+            mode:'time', value:9999, itemRate:0, ultsOn:true, dmgMult:1.0,
+            startPct:0, friendlyFire:false, gravityMult:1.0, gameSpeed:1.0, globalSize:1.0,
+        };
+
+        // Switch to game
+        if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
+        this._unbindEvents();
+        hideAllScreens();
+        document.getElementById('game-hud').classList.remove('hidden');
+        document.getElementById('score-banner').classList.add('hidden');
+        _showPauseBtn(false);
+        buildHUD();
+        gameState = 'INTRO';
+        window.loopRunning = false;
+        initGame();
+        showMobileControls(false);
+
+        // Show playtest exit overlay
+        const ov = document.getElementById('mb-playtest-overlay');
+        if (ov) ov.style.display = 'block';
+
+        this._playtesting = true;
+        playStageIntro(() => { gameState = 'PLAYING'; });
+
+        _mbShowToast('▶ Playtesting — press Exit Playtest to return to editor');
+    },
+
+    stopPlaytest() {
+        if (!this._playtesting) return;
+        this._playtesting = false;
+
+        // Stop game loop
+        gameState = 'MENU';
+        window.loopRunning = false;
+        if (itemSpawner) { clearInterval(itemSpawner); itemSpawner = null; }
+
+        // Remove temp map
+        const tmpIdx = MAPS.findIndex(m => m._id === '_playtest_current_');
+        if (tmpIdx >= 0) MAPS.splice(tmpIdx, 1);
+
+        // Restore state
+        slots = this._ptSavedSlots || [];
+        matchRules = this._ptSavedMatchRules || matchRules;
+        selectedMapIdx = Math.min(this._ptSavedMapIdx || 0, MAPS.length - 1);
+        onlineRole = this._ptSavedOnlineRole;
+        teamMode = false;
+
+        // Hide exit overlay
+        const ov = document.getElementById('mb-playtest-overlay');
+        if (ov) ov.style.display = 'none';
+
+        // Return to map editor
+        this._show();
     },
 
     // ── Open / Close ──────────────────────────────────────────
