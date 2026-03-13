@@ -3574,6 +3574,7 @@
         <!-- Top bar -->
         <div id="mb-topbar">
             <button id="mb-back-btn" onclick="MB.close()">← Back</button>
+            <button class="mb-action-btn mb-action-playtest" onclick="MB.playtest()" title="Play test this map (Esc to exit)">▶ Playtest</button>
 
             <input class="mb-title-input" id="mb-map-name" placeholder="Map Name" maxlength="32"
                 oninput="MB.map.name=this.value" />
@@ -3621,7 +3622,6 @@
             <div class="mb-topbar-actions">
                 <button class="mb-action-btn download" onclick="MB.download()">⬇ Download</button>
                 <button class="mb-action-btn save" onclick="MB.addToGame()">✦ Save to Game</button>
-                <button class="mb-action-btn mb-action-playtest" onclick="MB.playtest()" title="Play test this map (Esc to exit)">▶ Playtest</button>
             </div>
         </div>
 
@@ -13148,7 +13148,29 @@ class Player {
             else if(haz.type==='bumper'){let cx=haz.x+haz.w/2,cy=haz.y+haz.h/2;let px=this.x+this.width/2,py=this.y+this.height/2;let dist=Math.hypot(px-cx,py-cy);let bKb=haz.knockback??48;if(dist<haz.w/2+this.width/2&&this.bumperCooldown<=0){this.vx=((px-cx)/dist)*bKb;this.vy=((py-cy)/dist)*bKb;applyDamage(this,haz.damage??2,0,0,'none');spawnParticles(cx,cy,haz.color,20);triggerHitStun(3);this.bumperCooldown=20;}}
             else if(haz.type==='geyser'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>haz.y&&this.y<haz.y+haz.h){this.vy=Math.min(this.vy,-(haz.launchVy??44));if(haz.damage&&Math.random()<0.02)applyDamage(this,haz.damage,0,0,'up');if(gfx.particles&&Math.random()<0.3)spawnParticles(this.x+this.width/2,this.y+this.height,'#7dd3fc',3);}}
             else if(haz.type==='spike'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>=haz.y&&this.y+this.height<=haz.y+haz.h+8&&this.vy>=0&&!(this.spikeCooldown>0)){this.vy=-(haz.launchVy??20);applyDamage(this,haz.damage??10,0,0,'up');spawnParticles(this.x+this.width/2,haz.y,'#dc2626',8);this.spikeCooldown=30;}if(this.spikeCooldown>0)this.spikeCooldown--;}
-            else if(haz.type==='bouncePad'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>=haz.y&&this.y+this.height<=haz.y+haz.h+8&&this.vy>=0){this.vy=-(haz.launchVy??60);this.y=haz.y-this.height;this.onGround=false;spawnParticles(this.x+this.width/2,haz.y,'#22c55e',12);screenFlash=0.05;}}
+            else if(haz.type==='bouncePad'){
+                const _bpForce=haz.launchVy??60;
+                const _bpInX=this.x+this.width>haz.x&&this.x<haz.x+haz.w;
+                const _bpInY=this.y+this.height>haz.y&&this.y<haz.y+haz.h;
+                if(_bpInX&&_bpInY&&!(this.bouncePadCooldown>0)){
+                    if(isXAxis){
+                        // Side hit — bounce away horizontally
+                        const _bpPL=(this.x+this.width)-haz.x;
+                        const _bpPR=(haz.x+haz.w)-this.x;
+                        if(_bpPL<_bpPR){this.vx=-_bpForce;this.x=haz.x-this.width;}
+                        else{this.vx=_bpForce;this.x=haz.x+haz.w;}
+                        spawnParticles(this.x+this.width/2,this.y+this.height/2,'#22c55e',12);screenFlash=0.05;this.bouncePadCooldown=20;
+                    } else {
+                        // Top/bottom hit — bounce away vertically
+                        const _bpPT=(this.y+this.height)-haz.y;
+                        const _bpPB=(haz.y+haz.h)-this.y;
+                        if(_bpPT<_bpPB){this.vy=-_bpForce;this.y=haz.y-this.height;this.onGround=false;}
+                        else{this.vy=_bpForce;this.y=haz.y+haz.h;}
+                        spawnParticles(this.x+this.width/2,this.y+this.height/2,'#22c55e',12);screenFlash=0.05;this.bouncePadCooldown=20;
+                    }
+                }
+                if(this.bouncePadCooldown>0)this.bouncePadCooldown--;
+            }
             else if(haz.type==='freeze'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>haz.y&&this.y<haz.y+haz.h){const sf=haz.slowFactor??0.25;this.vx*=sf;if(this.vy>0)this.vy*=sf;if(gfx.particles&&Math.random()<0.04)spawnParticles(this.x+this.width/2,this.y+this.height/2,'#bfdbfe',2);}}
             else if(haz.type==='conveyor'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>=haz.y&&this.y+this.height<=haz.y+haz.h+4&&this.onGround){this.vx+=(haz.vx??3)*0.25;}}
             else if(haz.type==='deathZone'){if(this.x+this.width>haz.x&&this.x<haz.x+haz.w&&this.y+this.height>haz.y&&this.y<haz.y+haz.h&&!this.invincible&&!(this.deathZoneCooldown>0)){applyDamage(this,haz.damage??999,0,0,'up');screenFlash=0.4;spawnParticles(this.x+this.width/2,this.y+this.height/2,'#ef4444',25);this.deathZoneCooldown=90;}if(this.deathZoneCooldown>0)this.deathZoneCooldown--;}
