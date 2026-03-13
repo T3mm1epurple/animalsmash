@@ -2522,6 +2522,8 @@
             color:#94a3b8;
         }
         .mb-action-btn.download:hover { background:rgba(255,255,255,0.12); color:#e2e8f0; }
+        .mb-action-btn.mb-action-playtest { background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.4); color:#86efac; }
+        .mb-action-btn.mb-action-playtest:hover { background:rgba(34,197,94,0.28); color:#bbf7d0; transform:translateY(-1px); box-shadow:0 4px 14px rgba(34,197,94,0.3); }
         #mb-editor {
             display:flex; flex:1; min-height:0; overflow:hidden;
         }
@@ -2544,9 +2546,7 @@
         .mb-tool:hover { background:rgba(255,255,255,0.09); color:#e2e8f0; border-color:rgba(255,255,255,0.15); }
         .mb-tool.active { background:rgba(99,102,241,0.2); border-color:rgba(99,102,241,0.5); color:#a5b4fc; }
         .mb-tool-icon { display:block; font-size:18px; margin-bottom:2px; }
-        .mb-tool-playtest { background:rgba(34,197,94,0.15)!important; border-color:rgba(34,197,94,0.4)!important; color:#86efac!important; margin-top:4px; }
-        .mb-tool-playtest:hover { background:rgba(34,197,94,0.3)!important; color:#bbf7d0!important; }
-        #mb-playtest-overlay { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:200; pointer-events:all; }
+#mb-playtest-overlay { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:200; pointer-events:all; }
         #mb-playtest-stop-btn { background:rgba(239,68,68,0.92); border:2px solid rgba(255,100,100,0.6); color:#fff; font-family:'Poppins',sans-serif; font-size:13px; font-weight:700; padding:8px 20px; border-radius:10px; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.5); letter-spacing:0.5px; }
         #mb-playtest-stop-btn:hover { background:rgba(239,68,68,1); box-shadow:0 6px 20px rgba(0,0,0,0.6); transform:scale(1.03); }
         #mb-canvas-wrap {
@@ -3621,6 +3621,7 @@
             <div class="mb-topbar-actions">
                 <button class="mb-action-btn download" onclick="MB.download()">⬇ Download</button>
                 <button class="mb-action-btn save" onclick="MB.addToGame()">✦ Save to Game</button>
+                <button class="mb-action-btn mb-action-playtest" onclick="MB.playtest()" title="Play test this map (Esc to exit)">▶ Playtest</button>
             </div>
         </div>
 
@@ -3688,9 +3689,6 @@
                 <span class="mb-tool-label" style="margin-top:10px;">View</span>
                 <button class="mb-tool" onclick="MB.fitCamera()" title="Fit map to view">
                     <span class="mb-tool-icon">⊡</span>Fit
-                </button>
-                <button class="mb-tool mb-tool-playtest" onclick="MB.playtest()" title="Play test this map as Pigeon (Esc to exit)">
-                    <span class="mb-tool-icon">▶</span>Playtest
                 </button>
             </div>
 
@@ -16995,7 +16993,7 @@ ${obj.shape==='deco'?`<div class="mb-prop-row"><label>Border</label>
         // Set up single pigeon player, no opponents, infinite time
         onlineRole = null;
         teamMode = false;
-        slots = [{ id:0, type:'player', char:'🕊️', difficulty:'player', team:0 }];
+        slots = [{ id:0, type:'player', char:'🐦', difficulty:'player', team:0 }];
         matchRules = {
             mode:'time', value:9999, itemRate:0, ultsOn:true, dmgMult:1.0,
             startPct:0, friendlyFire:false, gravityMult:1.0, gameSpeed:1.0, globalSize:1.0,
